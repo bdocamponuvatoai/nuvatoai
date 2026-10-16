@@ -38,7 +38,7 @@ export default function Booking({details,onClose}:{details:ContactDetails;onClos
   },[]);
   useEffect(()=>{
     const abort=new AbortController();
-    fetch(`/api/availability?type=${type}`,{signal:abort.signal}).then(async r=>{
+    fetch(`/api/availability/?type=${type}`,{signal:abort.signal}).then(async r=>{
       const data:Availability=await r.json();
       if(!r.ok||!data.ok||!Array.isArray(data.days)) throw new Error(data.error||'Availability is temporarily unavailable.');
       const open=data.days.filter(d=>Array.isArray(d.slots)&&d.slots.length);
@@ -54,7 +54,7 @@ export default function Booking({details,onClose}:{details:ContactDetails;onClos
     if(busy||!date||!time)return;
     setBusy(true);setError('');setUncertain(false);
     try {
-      const r=await fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,date,time,name:details.name,email:details.email,company:details.company,phone:'',website:details.website||'',notes:`${details.service}. ${details.message}`})});
+      const r=await fetch('/api/bookings/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,date,time,name:details.name,email:details.email,company:details.company,phone:'',website:details.website||'',notes:`${details.service}. ${details.message}`})});
       const data=await r.json() as {ok?:boolean;meetLink?:string;error?:string;uncertain?:boolean};
       if(data.ok===true) {
         try {const url=new URL(data.meetLink || "");if(url.protocol==='https:')setMeetLink(url.href);}catch{}

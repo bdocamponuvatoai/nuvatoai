@@ -25,5 +25,7 @@ export const siteConfig = {
     countryCode: 'US',
     /** Published contact for legal, privacy, accessibility, and SMS help requests. Must be a monitored mailbox. */
     legalEmail: 'legal@nuvato.ai',
+    /** Public website named in the SMS terms and carrier registration. No trailing slash. */
+    publicUrl: 'https://www.nuvato.ai',
   },
 } as const;

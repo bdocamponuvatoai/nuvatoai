@@ -3,12 +3,16 @@ import {siteConfig} from './site-config';
 const {business}=siteConfig;
 const email=business.legalEmail;
 const location=`${business.locality}, ${business.region}, ${business.country}`;
+/** Full URLs as carriers require them in SMS terms (the published pages on the public domain). */
+const privacyUrl=`${business.publicUrl}/privacy/`;
+const termsUrl=`${business.publicUrl}/terms/`;
+const link=(url:string)=>`[${url}](${url})`;
 
 /** Publication details shown on each legal page. Update `updated` and `version` whenever the text changes. */
 export const legalMeta = {
   effective: 'October 17, 2026',
   updated: 'October 17, 2026',
-  version: '1.0',
+  version: '1.1',
   /** Website SMS enrollment is not offered; the SMS terms apply only to a separate opt-in. */
   smsEnrollmentEnabled: false,
 } as const;
@@ -26,7 +30,7 @@ const privacy:LegalDocument={
   description:'How Nuvato AI collects, uses, protects, and retains information when you use this website or request a consultation, and the choices you have.',
   summary:[
     {title:'Only what is needed',text:'Contact and appointment details are used to respond to your inquiry and arrange the meeting you request.'},
-    {title:'Never sold',text:'Personal information is not sold or shared for advertising. The website has no ad or tracking technology.'},
+    {title:'Never sold',text:'Personal information is never sold. SMS consent is not shared with third parties or affiliates.'},
     {title:'Your choices',text:`Ask to access, correct, or delete your information at any time by emailing ${email}.`},
   ],
   sections:renumber([
@@ -54,16 +58,17 @@ const privacy:LegalDocument={
       'Where data-protection laws such as the GDPR or UK GDPR apply, we process information on these bases: to take steps you request before entering into a contract, such as arranging a consultation; our legitimate interests in responding to business inquiries, securing the website, and preventing abuse; your consent, for any text-message program you join, which you can withdraw at any time; and compliance with legal obligations.',
       'Where we rely on legitimate interests, we balance those interests against your rights, and you may object.'
     ]},
-    {id:'sharing',title:'How we share information',paragraphs:[
-      'We share information only with service providers that help us operate the website and deliver what you request, such as hosting, booking, calendar, email, and messaging providers. They may use it only to provide their services to us.'
+    {id:'sharing',title:'How we share information',highlight:'SMS consent is not shared with third parties or affiliates. All of the categories below exclude text-messaging originator opt-in data and consent; this information will not be shared with any third parties.',paragraphs:[
+      'We share other personal information only with service providers that help us operate the website and deliver what you request, such as hosting, booking, calendar, and email providers. They may use it only to provide their services to us.'
     ],bullets:[
       'When you confirm a consultation, the details needed for that appointment are sent to our booking service to create your appointment and calendar invitation.',
       'We may disclose information when required by law, to respond to valid legal process, or to protect the rights, safety, and security of Nuvato AI, our clients, or others.',
       'If Nuvato AI is involved in a merger, acquisition, or sale of assets, information may be transferred as part of that transaction, subject to this policy.'
     ]},
-    {id:'mobile-information',title:'Mobile information and SMS consent',highlight:'Mobile information will not be sold or shared with third parties or affiliates for marketing or promotional purposes. SMS opt-in information and consent will not be sold, rented, or transferred to another business for its own use.',paragraphs:[
+    {id:'mobile-information',title:'Mobile information and SMS consent',highlight:'SMS consent is not shared with third parties or affiliates. Mobile information will not be sold or shared with third parties or affiliates for marketing or promotional purposes.',paragraphs:[
+      'If you opt in to text messages, we collect your mobile phone number and a record of your consent, and use them only to send the messages you agreed to receive and to honor opt-outs. The [SMS Terms & Conditions](/sms-terms/) describe the message types, frequency, and how to opt out.',
       'Text-message opt-in data and consent are excluded from any sharing of contact information for another organization’s marketing. Consent applies only to the Nuvato AI program and purposes described when you gave it.',
-      'Messaging providers and carriers process the information needed to deliver messages and apply opt-outs on our behalf. That processing does not permit them to use your number or consent for their own marketing.'
+      'Our messaging provider and mobile carriers process the information needed to deliver messages and apply opt-outs solely on our behalf. This is not sharing: they may not use your number or consent for any other purpose.'
     ]},
     {id:'cookies',title:'Cookies and tracking',paragraphs:[
       'This website does not use advertising cookies, analytics trackers, or cross-site tracking pixels, and it does not store consultation details in your browser’s storage. Form entries stay in page memory until you confirm a booking or leave the page.',
@@ -200,25 +205,31 @@ const terms:LegalDocument={
   sections:[...websiteSections,...contactSection],
 };
 
-/** Business-supplied SMS terms (October 16, 2026). Keep wording aligned with the carrier registration. */
+/** SMS terms written to the carrier (RingCentral / TCR) registration requirements. Keep in sync with the registered campaign. */
 const smsTerms:LegalDocument={
   slug:'sms-terms',title:'SMS Terms & Conditions',eyebrow:'CLEAR MESSAGES. CLEAR PERMISSION.',
-  description:'The terms for receiving text messages from Nuvato AI.',
-  effective:'October 16, 2026',updated:'October 16, 2026',
+  description:'The terms for receiving text messages from Nuvato AI: the messages you can expect, how often, and how to opt out or get help.',
+  effective:'October 16, 2026',updated:'October 17, 2026',
   summary:[
-    {title:'Optional',text:'Receiving SMS messages is optional and is not a condition of purchasing our products or services.'},
-    {title:'Reply STOP',text:'You may unsubscribe at any time by replying STOP to any text message.'},
-    {title:'Reply HELP',text:'Reply HELP for assistance or visit www.nuvato.ai.'},
+    {title:'Text STOP',text:'To opt out at any time, text STOP.'},
+    {title:'Text HELP',text:'For assistance, text HELP or visit our website at nuvato.ai.'},
+    {title:'Rates may apply',text:'Messaging frequency may vary. Message and data rates may apply.'},
   ],
   sections:renumber([
-    {id:'program',title:'Program',paragraphs:['By opting in to receive SMS messages from Nuvato AI, you agree to receive text messages related to service inquiries, appointments, consultations, project updates, service notifications, and customer support.']},
-    {id:'frequency',title:'Message frequency',paragraphs:['Message frequency may vary depending on your interactions with Nuvato AI.']},
-    {id:'rates',title:'Message and data rates',highlight:'Message and data rates may apply.'},
-    {id:'opt-out',title:'Opt-out',paragraphs:['You may unsubscribe at any time by replying STOP to any text message.']},
-    {id:'help',title:'Help',paragraphs:[`Reply HELP for assistance or visit [www.nuvato.ai](https://www.nuvato.ai/). You can also email ${email}.`]},
-    {id:'privacy',title:'Privacy',paragraphs:['We respect your privacy. Mobile opt-in information and SMS consent will not be shared with third parties or affiliates for marketing or promotional purposes. Please review our [Privacy Policy](/privacy/).']},
-    {id:'consent',title:'Consent',paragraphs:['Receiving SMS messages is optional and is not a condition of purchasing our products or services.']},
-    {id:'carrier',title:'Carrier disclaimer',paragraphs:['Mobile carriers are not responsible for delayed or undelivered messages.']},
+    {id:'sms-terms-of-service',title:'SMS Terms of Service',highlight:`By opting into SMS from a web form or other medium, you are agreeing to receive SMS messages from Nuvato AI. This includes SMS messages for conversations (external). Message frequency varies. Message and data rates may apply. See privacy policy at ${link(privacyUrl)}. Message HELP for help. Reply STOP to any message to opt out.`},
+    {id:'message-types',title:'Types of messages',paragraphs:['You can expect to receive text messages from Nuvato AI about:'],bullets:[
+      'appointment confirmations and reminders for consultations you book;',
+      'responses to your service inquiries;',
+      'project updates and service notifications for work you requested;',
+      'customer support conversations.'
+    ]},
+    {id:'frequency',title:'Message frequency',paragraphs:['Messaging frequency may vary, depending on your appointments, active projects, and support requests.']},
+    {id:'rates',title:'Message and data rates',highlight:'Message and data rates may apply.',paragraphs:['Your mobile carrier’s plan determines any charges. Contact your carrier for details.']},
+    {id:'opt-out',title:'How to opt out',highlight:'To opt out at any time, text STOP.',paragraphs:['Reply STOP to any message from Nuvato AI. You will receive one message confirming you have been unsubscribed, and no further messages unless you opt in again.']},
+    {id:'help',title:'How to get help',highlight:'For assistance, text HELP or visit our website at [nuvato.ai](https://www.nuvato.ai/).',paragraphs:[`You can also email ${email}.`]},
+    {id:'privacy',title:'Privacy Policy and Terms of Service',paragraphs:[`Visit ${link(privacyUrl)} for privacy policy and ${link(termsUrl)} for Terms of Service.`,'SMS consent is not shared with third parties or affiliates.']},
+    {id:'consent',title:'Consent',paragraphs:['Receiving SMS messages is optional. Consent is not a condition of purchasing any products or services. You must be the account holder or an authorized user of the mobile number you provide, and be 18 or older.']},
+    {id:'carrier',title:'Carrier disclaimer',paragraphs:['Mobile carriers are not liable for delayed or undelivered messages.']},
   ]),
 };
 

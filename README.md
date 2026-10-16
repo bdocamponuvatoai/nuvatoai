@@ -90,7 +90,7 @@ pnpm dev
 Run the full quality gate before you open a pull request:
 
 ```sh
-pnpm check   # typecheck + lint + 288 automated site checks
+pnpm check   # typecheck + lint + 331 automated site checks
 pnpm build   # production build into dist/
 ```
 
@@ -107,7 +107,7 @@ pnpm build   # production build into dist/
 | `pnpm start` | Serves the built Worker locally with Wrangler (`dist/server/wrangler.json`) |
 | `pnpm typecheck` | `tsc --noEmit` in strict mode |
 | `pnpm lint` | ESLint with the Next.js Core Web Vitals and TypeScript rules |
-| `pnpm verify` | 288 SSR, content, SEO, security-header, validation, and mocked-booking checks. **It never sends a real booking.** |
+| `pnpm verify` | 331 SSR, content, SEO, security-header, validation, and mocked-booking checks. **It never sends a real booking.** |
 | `pnpm check` | `typecheck` + `lint` + `verify`, the pre-merge gate |
 | `pnpm db:generate` | Generates a Drizzle migration after you edit `db/schema.ts` |
 
@@ -388,7 +388,7 @@ If the binding is missing or unavailable, booking **fails closed** with a 503. I
 | --- | --- | --- |
 | Types | `pnpm typecheck` | ✅ 0 errors |
 | Lint | `pnpm lint` | ✅ 0 errors, 0 warnings |
-| Site checks | `pnpm verify` | ✅ 288 / 288 |
+| Site checks | `pnpm verify` | ✅ 331 / 331 |
 | Production build | `pnpm build` | ✅ |
 | Browser check | Chrome, 1440px and 390px | ✅ Navigation tones, menu, mobile sheet, focus handling, legal pages, 404 |
 
@@ -400,11 +400,29 @@ Not covered yet: end-to-end browser tests, Lighthouse, Google Rich Results valid
 
 ## Deployment
 
-The project targets **Cloudflare Workers**. `pnpm build` writes the client assets and the Worker bundle to `dist/`, with a generated `dist/server/wrangler.json`.
+The same codebase deploys to **Vercel** (official Next.js build) or **Cloudflare Workers** (Vinext build). Pages and components are shared; only the build command and two platform adapters differ.
+
+| | Vercel | Cloudflare Workers |
+| --- | --- | --- |
+| Build | `pnpm build:vercel` (`next build`, set in `vercel.json`) | `pnpm build` (Vinext writes `dist/`) |
+| Security headers and CSP nonce | `proxy.ts`, which only runs when `VERCEL=1` | `build/sites-worker.ts` |
+| Booking rate-limit store | Upstash Redis (`KV_REST_API_URL` and `KV_REST_API_TOKEN`) | Cloudflare D1 bound as `DB` |
+
+Both platforms share `app/lib/security.ts` and `app/lib/rate-limit.ts`, so the headers and limits are identical. If the rate-limit store is missing or unreachable, booking **fails closed** with a 503 on either platform.
+
+### Vercel
+
+1. Import the GitHub repository in Vercel. `vercel.json` sets the install and build commands, so no dashboard overrides are needed.
+2. Connect **Upstash Redis** from the Vercel Marketplace: **Storage → Create → Upstash → Redis**, then connect it to the project. This injects `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Redeploy afterwards.
+3. Add the domain `www.nuvato.ai` (and `nuvato.ai` redirecting to it) under **Settings → Domains**.
+4. Before launch, update `siteConfig.origin` and `siteConfig.indexable`. See the [Launch checklist](#launch-checklist).
+
+> Vercel preview deployments inject the Vercel toolbar script, which the strict CSP blocks. This only affects previews and doesn't break the site.
+
+### Cloudflare Workers
 
 - **Current host:** the Sites platform. Its identity and D1 binding are declared in `.openai/hosting.json`.
 - **Your own Cloudflare account:** create a D1 database, apply the migration, set the real `database_id` for the `DB` binding, then deploy the built Worker with Wrangler.
-- Before you point a public domain at it, work through the [Launch checklist](#launch-checklist).
 
 ---
 
@@ -415,6 +433,8 @@ The project targets **Cloudflare Workers**. `pnpm build` writes the client asset
 - [ ] Create the `legal@nuvato.ai` mailbox, or a forward to a monitored inbox, and confirm that someone checks it. Privacy requests have legal response deadlines.
 - [ ] Set up the 2-year retention schedule: delete or de-identify inquiry and booking records after 2 years in the booking service and CRM.
 - [ ] Optional but recommended: have an attorney review the Privacy Policy and Terms.
+- [ ] Connect Upstash Redis in Vercel so booking works (see [Deployment](#deployment)).
+- [ ] SMS registration (RingCentral): once the site is live on `www.nuvato.ai`, confirm https://www.nuvato.ai/privacy/ and https://www.nuvato.ai/sms-terms/ load, then submit them as the Privacy Policy and Terms & Conditions links.
 - [ ] Have the client confirm the agent descriptions marked `review: true` in `app/lib/content.ts`.
 - [ ] Bind a production D1 database as `DB` and apply the migrations.
 - [ ] Place one authorized end-to-end test booking and confirm the calendar invite and email.

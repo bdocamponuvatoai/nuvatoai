@@ -1,7 +1,7 @@
 import type {Metadata} from 'next';
 import Link from 'next/link';
 import {ArrowLeft, ArrowUpRight} from 'lucide-react';
-import {LegalHeader} from './components/LegalPage';
+import {LegalFooter, LegalHeader} from './components/LegalPage';
 
 export const metadata: Metadata = {title: 'Page not found | Nuvato AI', robots: {index: false, follow: false}};
 
@@ -17,5 +17,6 @@ export default function NotFound() {
         <Link href="/#contact" className="button button-secondary">Book a consultation<ArrowUpRight size={18} aria-hidden="true"/></Link>
       </div>
     </main>
+    <LegalFooter/>
   </>;
 }

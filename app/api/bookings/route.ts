@@ -7,9 +7,22 @@ const bookingSchema=z.object({
 });
 const reply=(body:unknown,status=200,extra:Record<string,string>={})=>Response.json(body,{status,headers:{'Cache-Control':'no-store',...extra}});
 async function boundedBody(request:Request){const reader=request.body?.getReader();if(!reader)return '';let size=0;const parts:Uint8Array[]=[];for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>12000){await reader.cancel();throw new RangeError('Body too large');}parts.push(value);}const out=new Uint8Array(size);let pos=0;for(const p of parts){out.set(p,pos);pos+=p.byteLength;}return new TextDecoder().decode(out);}
-export function createBookingHandler(limit:typeof bookingRateLimit){return async function POST(request:Request){
+/**
+ * Same-origin check. Accepts the request URL's origin and the host the browser actually
+ * addressed (Host / X-Forwarded-Host): behind Vercel or another proxy, request.url can carry
+ * an internal host. Cross-site pages can't set these headers without a CORS preflight, which
+ * this route never approves, and every request must also be JSON.
+ */
+function isSameOrigin(request:Request){
  const origin=request.headers.get('origin');
- if(origin!==new URL(request.url).origin||request.headers.get('sec-fetch-site')==='cross-site')return reply({ok:false,error:'Please book from this website.'},403);
+ if(!origin||request.headers.get('sec-fetch-site')==='cross-site')return false;
+ const url=new URL(request.url);
+ const host=request.headers.get('x-forwarded-host')?.split(',')[0]?.trim()||request.headers.get('host');
+ const protocol=request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim()||url.protocol.replace(':','');
+ return origin===url.origin||(!!host&&origin===`${protocol}://${host}`);
+}
+export function createBookingHandler(limit:typeof bookingRateLimit){return async function POST(request:Request){
+ if(!isSameOrigin(request))return reply({ok:false,error:'Please book from this website.'},403);
  if(!request.headers.get('content-type')?.split(';')[0].trim().match(/^application\/json$/i))return reply({ok:false,error:'Invalid request format.'},415);
  let payload;try{payload=bookingSchema.parse(JSON.parse(await boundedBody(request)));}catch(e){return reply({ok:false,error:e instanceof RangeError?'Request is too large.':'Please check your name, email, company, and appointment details.'},e instanceof RangeError?413:400);}
  if(payload.website)return reply({ok:false,error:'Unable to process this request.'},400);
