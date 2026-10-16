@@ -1,0 +1,99 @@
+[
+  {
+    "file": "hubspot.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/simple-icons.json",
+    "icon": "hubspot",
+    "license": "CC0-1.0",
+    "sha256": "70331d494ebbb66443b691800f6faf723d07e6f35f42153683ecfcbe05e1ab74"
+  },
+  {
+    "file": "salesforce.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/logos.json",
+    "icon": "salesforce",
+    "license": "CC0-1.0",
+    "sha256": "d541c1e6a2705bef4320df74509204484b58a213ad414e24ad182643df7d6d54"
+  },
+  {
+    "file": "gmail.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/logos.json",
+    "icon": "google-gmail-2020",
+    "license": "CC0-1.0",
+    "sha256": "482996399c19486ef8102faa98ffbb887bfcacd63f3c48ab26660b5f9695ceab"
+  },
+  {
+    "file": "slack.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/logos.json",
+    "icon": "slack-icon",
+    "license": "CC0-1.0",
+    "sha256": "b35d0faf5b8b1c404d73e45b2f00c87442e8fcd55b568b77aca66c22f38cd085"
+  },
+  {
+    "file": "asana.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/logos.json",
+    "icon": "asana-icon",
+    "license": "CC0-1.0",
+    "sha256": "accc3ff25c56d7be4f682ff49dabcbce3afc36e073d1f172458c40597ff5b65e"
+  },
+  {
+    "file": "notion.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/logos.json",
+    "icon": "notion-icon",
+    "license": "CC0-1.0",
+    "sha256": "4595fc9e0a049509cf9f442e548bbccbc83d560bcdec14972bedd1440152db89"
+  },
+  {
+    "file": "calendar.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/logos.json",
+    "icon": "google-calendar-2020",
+    "license": "CC0-1.0",
+    "sha256": "7c4b9f4b22afe3ed3e52847759290177b9cc87aaea2a2b3f8f690cf9d34429a9"
+  },
+  {
+    "file": "quickbooks.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/simple-icons.json",
+    "icon": "quickbooks",
+    "license": "CC0-1.0",
+    "sha256": "067380974bd175b641112ebc5e73b54103f24dc74972e76b8e21f0f14448d464"
+  },
+  {
+    "file": "stripe.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/logos.json",
+    "icon": "stripe",
+    "license": "CC0-1.0",
+    "sha256": "fb22a81ae77c0e51c1d76cfaea2cdd606bb5cb9b61bfa6d9e69a3627d6cec930"
+  },
+  {
+    "file": "xero.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/logos.json",
+    "icon": "xero",
+    "license": "CC0-1.0",
+    "sha256": "2d48c957b9adad058109fd4ef7ff96c24e6ccf0958809995ca823fbbf4acbc4a"
+  },
+  {
+    "file": "zendesk.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/logos.json",
+    "icon": "zendesk-icon",
+    "license": "CC0-1.0",
+    "sha256": "ed9bbb370dcff69b7fe249c704a4456f23ec8e82c2da4871bf3e20c6a3a11ffb"
+  },
+  {
+    "file": "intercom.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/logos.json",
+    "icon": "intercom-icon",
+    "license": "CC0-1.0",
+    "sha256": "b67557c058fa9080781feba1ae77f56ab5e269d857b65cd486e4732692e38bc3"
+  },
+  {
+    "file": "docusign.svg",
+    "source": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/simple-icons.json",
+    "icon": "docusign",
+    "license": "CC0-1.0",
+    "sha256": "c108905e0cf67bf6c644bdfddc35f9f62c52e9ae69a1e64220d4bcc845264984"
+  },
+  {
+    "file": "sheets.svg",
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/google-sheets.svg",
+    "license": "Apache-2.0 repository; third-party trademark",
+    "sha256": "d5b7a4ac78701b87069182b5780d5c966ffcb7715119618ffc215ae429b46898"
+  }
+]
