@@ -1,33 +1,38 @@
-import {NextResponse, type NextRequest} from 'next/server';
-import {securityHeaderEntries, securityPolicy} from './app/lib/security';
-import {siteConfig} from './app/lib/site-config';
+import { NextResponse, type NextRequest } from 'next/server';
+import { imageKitEndpoint } from './lib/assets';
+import { contentSecurityPolicy } from './lib/security';
 
-/**
- * Per-request CSP nonce and security headers for the Vercel deployment.
- *
- * On Cloudflare, build/sites-worker.ts already does this before Vinext runs. Vinext
- * also executes proxy.ts, and a second nonce would not match the worker's CSP, so
- * this only acts where Vercel sets VERCEL=1.
- */
+// A trailing slash makes the CSP source match everything under the folder, and nothing else.
+const imageSources = [`${imageKitEndpoint}/`];
+
+/** Generates a fresh CSP nonce for every page request. Static security headers live in next.config.ts. */
 export function proxy(request: NextRequest) {
-  if (process.env.VERCEL !== '1') return NextResponse.next();
-
   const nonce = btoa(crypto.randomUUID());
-  const secure = request.nextUrl.protocol === 'https:';
-  const requestHeaders = new Headers(request.headers);
-  // Next.js reads the nonce from the request CSP and applies it to its own scripts;
-  // layout.tsx reads x-nonce for the JSON-LD block and x-site-path to scope it to the homepage.
-  requestHeaders.set('Content-Security-Policy', securityPolicy(nonce, secure));
-  requestHeaders.set('x-nonce', nonce);
-  requestHeaders.set('x-site-path', request.nextUrl.pathname);
+  const policy = contentSecurityPolicy(nonce, {
+    secure: request.nextUrl.protocol === 'https:',
+    development: process.env.NODE_ENV === 'development',
+    imageSources,
+  });
 
-  const response = NextResponse.next({request: {headers: requestHeaders}});
-  for (const [name, value] of securityHeaderEntries(nonce, secure)) response.headers.set(name, value);
-  if (!siteConfig.indexable) response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  // Next.js extracts the nonce from the request's CSP header during rendering.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('Content-Security-Policy', policy);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set('Content-Security-Policy', policy);
   return response;
 }
 
 export const config = {
-  // Pages and API routes; static assets don't need a nonce.
-  matcher: ['/((?!_next/static|_next/image|brand/|fonts/|tools/|favicon.ico|manifest.webmanifest).*)'],
+  matcher: [
+    {
+      // Pages only: API routes return JSON, and static assets need no nonce.
+      source:
+        '/((?!api/|_next/static|_next/image|favicon.ico|icon1.png|icon2.png|apple-icon.png|manifest.webmanifest|robots.txt|sitemap.xml).*)',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
+  ],
 };
