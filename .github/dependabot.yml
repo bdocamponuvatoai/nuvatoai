@@ -1,0 +1,36 @@
+# Weekly dependency updates. The 7-day cooldown matches minimumReleaseAge in
+# pnpm-workspace.yaml, so Dependabot never proposes a release pnpm would refuse.
+# Security updates are opened as soon as an advisory is published.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    groups:
+      # Patch and minor updates arrive as one pull request per group.
+      runtime:
+        dependency-type: production
+        update-types: [minor, patch]
+      tooling:
+        dependency-type: development
+        update-types: [minor, patch]
+    commit-message:
+      prefix: chore(deps)
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: chore(ci)
