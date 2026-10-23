@@ -1,3 +1,5 @@
+import { CALENDLY_ORIGIN } from './calendly';
+
 type PolicyOptions = {
   /** False only for local http:// servers, where WebKit would upgrade every asset to a missing https:// URL. */
   secure?: boolean;
@@ -19,6 +21,8 @@ export function contentSecurityPolicy(
     "style-src 'self' 'unsafe-inline'",
     ["img-src 'self' data:", ...imageSources].join(' '),
     "font-src 'self'",
+    // The booking dialog embeds Calendly's scheduler. No Calendly script runs on our pages.
+    `frame-src ${CALENDLY_ORIGIN}`,
     "connect-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",

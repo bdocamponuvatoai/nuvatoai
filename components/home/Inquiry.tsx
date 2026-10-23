@@ -109,7 +109,6 @@ export default function Inquiry() {
       company: field(data, 'company'),
       service: choices.join(', '),
       message: `Timeline: ${timeline}. ${need}`,
-      website: String(data.get('website') || ''),
     });
   }
 
@@ -219,19 +218,12 @@ export default function Inquiry() {
           </div>
         ))}
         <p className="form-disclosure">
-          Your details are sent to Nuvato AI only when you confirm a booking, and are used to
-          arrange and prepare for your consultation. This does not enroll you in SMS. See our{' '}
+          When you choose a time, these details are passed to our scheduling provider, Calendly, to
+          fill in the booking form, and are used to arrange and prepare for your consultation.
+          Nothing is booked until you confirm a time. This does not enroll you in SMS. See our{' '}
           <Link href="/privacy/">Privacy Policy</Link> and <Link href="/terms/">Terms</Link>.
         </p>
       </fieldset>
-
-      {/* Honeypot: hidden from people and assistive technology; bots tend to fill it in. */}
-      <div className="honeypot" aria-hidden="true">
-        <label>
-          Leave this field empty
-          <input name="website" tabIndex={-1} autoComplete="off" />
-        </label>
-      </div>
 
       <div className="form-actions">
         {step > 0 && (

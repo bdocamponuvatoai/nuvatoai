@@ -6,12 +6,10 @@
 
 # Security-sensitive areas (see SECURITY.md).
 /lib/security.ts    @bdocamponuvatoai
-/lib/booking.ts     @bdocamponuvatoai
-/lib/rate-limit.ts  @bdocamponuvatoai
+/lib/calendly.ts    @bdocamponuvatoai
 /lib/env.ts         @bdocamponuvatoai
 /proxy.ts           @bdocamponuvatoai
 /next.config.ts     @bdocamponuvatoai
-/app/api/           @bdocamponuvatoai
 /.github/           @bdocamponuvatoai
 
 # Legal copy, including carrier-registered SMS terms.
