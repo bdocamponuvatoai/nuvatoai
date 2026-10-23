@@ -17,8 +17,8 @@ _Built by **Blair** — Lead Website Developer, Nuvato AI_
 The public website for **Nuvato AI**, part of the Isak Global Ventures family. It presents five services, a searchable catalog of twelve AI agents, the delivery process, security posture, and FAQs, and ends with a four-step consultation flow that books a live appointment.
 
 - **Server-rendered:** all content is in the initial HTML; only interactive parts hydrate.
-- **Live booking:** validated, rate-limited, and forwarded to the existing booking service. Nothing is booked until the visitor confirms.
-- **Secure by default:** per-request CSP nonce, strict headers, no cookies or third-party scripts.
+- **Live booking:** a Calendly scheduler inside the site's own booking dialog, pre-filled with the visitor's answers. Nothing is booked until the visitor confirms a time.
+- **Secure by default:** per-request CSP nonce, strict headers, no server-side secrets, and no cookies or third-party scripts on the site itself.
 - **Legal pages:** Privacy Policy, Terms & Disclaimer, and SMS Terms.
 
 ## Documentation
@@ -42,9 +42,9 @@ pnpm install
 pnpm dev        # http://localhost:3000
 ```
 
-No environment variables are needed locally. Booking falls back to an in-memory rate limiter in development.
+No environment variables are needed.
 
-> Availability and bookings use the **live** `nuvato.ai` booking service. Browsing the calendar is safe; **confirming a booking creates a real appointment.**
+> The booking dialog shows the **live** Calendly calendar. Browsing it is safe; **confirming a time creates a real appointment.**
 
 ## Scripts
 
@@ -67,8 +67,6 @@ app/                    Routes (App Router)
   layout.tsx            Root layout: fonts, metadata, per-request rendering for CSP nonces
   page.tsx              Homepage + JSON-LD
   privacy/ terms/ sms-terms/   Legal pages
-  api/availability/     GET  — read-only bridge to the booking service
-  api/bookings/         POST — validated, rate-limited booking
   robots.ts sitemap.ts manifest.ts   Metadata routes
   favicon.ico icon1.png icon2.png apple-icon.png   App icons
   error.tsx global-error.tsx not-found.tsx
@@ -77,7 +75,7 @@ app/                    Routes (App Router)
 components/
   home/                 Homepage sections and their interactive parts
   legal/                Legal page layout
-lib/                    Content, configuration, and server logic (no React)
+lib/                    Content, configuration, Calendly, ImageKit, SEO, and security (no React)
 proxy.ts                Per-request CSP nonce
 tests/                  Vitest suites
 docs/                   Architecture and project documentation
@@ -85,17 +83,17 @@ docs/                   Architecture and project documentation
 
 ## Configuration
 
-Environment variables are read in `lib/env.ts` and documented in [`.env.example`](.env.example). Set them in Vercel → Project Settings → Environment Variables.
+Environment variables are read in `lib/env.ts` and documented in [`.env.example`](.env.example). None hold secrets. Set them in Vercel → Project Settings → Environment Variables, with type **Config**.
 
-| Variable                               | Required             | Purpose                                                                                 |
-| -------------------------------------- | -------------------- | --------------------------------------------------------------------------------------- |
-| `KV_REST_API_URL`, `KV_REST_API_TOKEN` | **Production**       | Upstash Redis for booking rate limits. Added by the Vercel Marketplace integration. Without them, booking returns 503. |
-| `SITE_URL`                             | Recommended          | Canonical origin for links, the sitemap, and social cards. Defaults to the Vercel production domain. |
-| `SITE_INDEXABLE`                       | At launch            | `true` allows search indexing. Ignored on preview deployments, which are always `noindex`. |
-| `BOOKING_SERVICE_ORIGIN`               | Only if `nuvato.ai` moves | Booking upstream. Defaults to `https://nuvato.ai`.                                  |
-| `NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT`    | No                   | Overrides the ImageKit folder (defaults to `https://ik.imagekit.io/isakglobalventures/nuvato`). |
+| Variable                            | Required    | Purpose                                                                                              |
+| ----------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------- |
+| `SITE_URL`                          | Recommended | Canonical origin for links, the sitemap, and social cards. Defaults to the Vercel production domain. |
+| `SITE_INDEXABLE`                    | At launch   | `true` allows search indexing. Ignored on preview deployments, which are always `noindex`.           |
+| `NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT` | No          | Overrides the ImageKit folder (defaults to `https://ik.imagekit.io/isakglobalventures/nuvato`).      |
 
-`SITE_URL` and `SITE_INDEXABLE` are read at build time, so redeploy after changing them. Use type **Secret** in Vercel for the Redis token and **Config** for the rest.
+`SITE_URL` and `SITE_INDEXABLE` are read at build time, so redeploy after changing them.
+
+The Calendly event link, meeting name, and duration are in `siteConfig.consultation` (`lib/site-config.ts`). Availability, reminders, and booking questions are managed in the Calendly dashboard.
 
 ## Deployment
 
@@ -106,11 +104,11 @@ Hosted on Vercel. `vercel.json` sets the install command (`pnpm install --frozen
 
 ## Launch checklist
 
-- [ ] Connect **Upstash Redis** in Vercel, then place one authorized test booking and confirm the calendar invite and email.
+- [ ] Place one test booking through the site, confirm the "You're booked" screen, the confirmation email, and the calendar invite, then cancel it in Calendly.
+- [ ] In Calendly, confirm the Discovery call's questions are, in order, Company, Services of interest, and Project details, with no phone number or text reminders.
 - [ ] Set `SITE_URL=https://www.nuvato.ai` and `SITE_INDEXABLE=true` for Production, redeploy, and confirm `/robots.txt` allows crawling.
-- [ ] If this site replaces `nuvato.ai`, point `BOOKING_SERVICE_ORIGIN` at the booking service's own host so the API doesn't call itself.
 - [ ] Confirm someone monitors `legal@nuvato.ai`. Privacy requests have legal deadlines.
-- [ ] Set up the 2-year retention schedule in the booking service and CRM.
+- [ ] Set up the 2-year retention schedule in Calendly and the CRM.
 - [ ] Have the client approve the agent descriptions marked `review: true` in `lib/content.ts`.
 - [ ] SMS registration: once live on `www.nuvato.ai`, confirm `/privacy/` and `/sms-terms/` load, then submit them to RingCentral.
 - [ ] Run Lighthouse and the Google Rich Results test on the live URL.

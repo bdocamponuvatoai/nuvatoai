@@ -4,13 +4,12 @@ How the Nuvato AI site works, and why it is built this way. For setup and comman
 
 ## System overview
 
-A Next.js 16 App Router site on Vercel. It has no database of its own. It talks to three external services:
+A Next.js 16 App Router site on Vercel. It has no database, no API routes, and no secrets of its own. It uses two external services, both loaded directly by the visitor's browser:
 
-| Service                    | Used for                                   | Called from        | Configured by                   |
-| -------------------------- | ------------------------------------------ | ------------------ | ------------------------------- |
-| **Booking service** (`nuvato.ai`) | Live availability and creating appointments | Server (API routes) | `BOOKING_SERVICE_ORIGIN`        |
-| **Upstash Redis**          | Booking rate-limit counters                | Server             | `KV_REST_API_URL`, `KV_REST_API_TOKEN` |
-| **ImageKit**               | Storing and serving every site image       | Browser            | `lib/assets.ts` (built-in default) |
+| Service      | Used for                                                         | Configured in                     |
+| ------------ | ---------------------------------------------------------------- | --------------------------------- |
+| **Calendly** | Availability, booking, confirmation emails, calendar invitations | `lib/site-config.ts` (`consultation`) |
+| **ImageKit** | Storing and serving every site image                             | `lib/assets.ts`                   |
 
 ```mermaid
 flowchart LR
@@ -19,26 +18,22 @@ flowchart LR
   subgraph vercel [Vercel]
     proxy[proxy.ts<br/>per-request CSP nonce]
     pages[Pages<br/>server-rendered]
-    api[API routes<br/>/api/availability<br/>/api/bookings]
   end
 
-  booking[(Booking service<br/>nuvato.ai)]
-  redis[(Upstash Redis<br/>rate limits)]
+  calendly[(Calendly<br/>scheduling)]
   imagekit[(ImageKit<br/>images)]
 
   browser --> proxy --> pages
-  browser -- fetch --> api
-  api --> booking
-  api --> redis
+  browser -- iframe in booking dialog --> calendly
   browser -- img --> imagekit
 ```
 
-The browser never talks to the booking service or Redis directly. API routes validate and forward requests, so credentials and upstream URLs stay on the server.
+Because the site holds no credentials and stores no visitor data, there is nothing on the server for an attacker to extract. The Calendly account and ImageKit library are managed in their own dashboards.
 
 ## Request lifecycle
 
-1. **`proxy.ts`** runs for every page request (not for API routes, static files, or icons). It generates a random nonce and sets the `Content-Security-Policy` header on both the request and the response.
-2. **`next.config.ts`** adds the static security headers (HSTS, `nosniff`, `X-Frame-Options`, and others) to every response, including API routes.
+1. **`proxy.ts`** runs for every page request (not for static files or icons). It generates a random nonce and sets the `Content-Security-Policy` header on both the request and the response.
+2. **`next.config.ts`** adds the static security headers (HSTS, `nosniff`, `X-Frame-Options`, and others) to every response.
 3. **`app/layout.tsx`** calls `connection()`, which makes every page render per request. This is required: Next.js reads the nonce from the request's CSP header during rendering and adds it to its own `<script>` tags. A statically pre-rendered page would have no nonce, and the CSP would block its scripts.
 4. The page renders on the server and streams to the browser, which hydrates only the client components.
 
@@ -72,53 +67,49 @@ All content is in the server-rendered HTML, including every service panel, agent
 
 ## Booking flow
 
+Booking is handled by **Calendly**, embedded in the site's own booking dialog.
+
 ```mermaid
 sequenceDiagram
   actor V as Visitor
   participant F as Inquiry form<br/>(client)
-  participant A as /api/availability
-  participant B as /api/bookings
-  participant R as Upstash Redis
-  participant S as Booking service
+  participant D as Booking dialog<br/>(client)
+  participant C as Calendly<br/>(iframe)
 
   V->>F: 4 steps: need, services, timeline, contact
-  F->>A: GET ?type=MT-1
-  A->>S: GET /api/availability?days=14
-  S-->>A: open days and slots
-  A-->>F: slots (never cached)
-  V->>F: pick a time, review, confirm
-  F->>B: POST booking (JSON)
-  Note over B: 1. same-origin check<br/>2. JSON only<br/>3. 12 KB body limit<br/>4. zod validation<br/>5. honeypot
-  B->>R: count attempt (hashed email + IP)
-  R-->>B: attempts this window
-  B->>S: POST /api/bookings (allowlisted fields only)
-  S-->>B: result
-  B-->>F: 200 booked · 409 pick another time · 429 slow down · 502 uncertain
+  F->>D: open with the visitor's answers
+  D->>C: load scheduler, pre-filled (name, email, a1–a3)
+  C-->>D: calendly.page_height (dialog resizes to fit)
+  V->>C: pick a time, confirm
+  Note over C: Calendly creates the event,<br/>sends the confirmation email<br/>and calendar invitation
+  C-->>D: calendly.event_scheduled
+  D-->>V: "You're booked." screen
 ```
 
-Design decisions:
+How it fits together (`components/home/Booking.tsx`, `lib/calendly.ts`):
 
-- **Nothing is stored by this site.** The visitor's details stay in browser memory until they confirm, then go straight to the booking service.
-- **Fails closed.** If Redis is unreachable or not configured in production, booking returns 503 instead of accepting unlimited attempts. Local development uses an in-memory limiter (`lib/rate-limit.ts`).
-- **Never retries a write.** A timed-out request may still have created the appointment, so an uncertain result (502 with `uncertain: true`) tells the visitor to check their email before trying again, and disables the confirm button.
-- **Privacy-preserving counters.** Rate-limit keys are SHA-256 hashes of the email and IP, scoped to a 15-minute window. No raw email or IP is ever stored.
-- **Limits:** 5 attempts per email and 10 per IP per 15 minutes.
+- **Embedded as a plain iframe, without Calendly's `widget.js`.** Loading third-party script would mean loosening the CSP's `script-src`. The iframe needs only `frame-src https://calendly.com`.
+- **Pre-filled.** `calendlyEmbedUrl()` passes the visitor's name and email, plus the company, services, and project notes as custom answers `a1`–`a3`. These map to the Calendly event type's questions **in order**, so keep them as 1. Company, 2. Services of interest, 3. Project details.
+- **Matches the site.** The same URL sets Calendly's colors to the design tokens and hides the event details the dialog already shows. The dialog itself pairs a navy brand panel (logo, meeting facts, who is booking, next steps) with the scheduler, and stacks into a compact header on narrow screens.
+- **Trusted messages only.** Calendly reports the page height and a confirmed booking with `postMessage`. `readCalendlyEvent()` ignores any message not from exactly `https://calendly.com`, so another page or frame can't fake a confirmed booking.
+- **Graceful failure.** If the scheduler hasn't loaded within 15 seconds (offline, or blocked by a browser extension), the dialog offers a direct link to the Calendly page.
+- **Nothing is stored by this site.** Answers stay in browser memory until the scheduler opens, and then go only to Calendly.
 
-The handler is built by `createBookingHandler(limit)` in `lib/booking.ts`, which takes the rate limiter as a parameter so tests can substitute one.
+The event link, name, and duration live in `siteConfig.consultation` (`lib/site-config.ts`). Calendly settings (availability, buffers, reminders, questions) are managed in the Calendly dashboard. **Never add a phone-number question or text reminders**: the site promises that booking doesn't collect a phone number or enroll anyone in SMS, and the SMS carrier registration relies on that.
 
 ## Security model
 
 | Layer                 | Where                         | What it does                                                                      |
 | --------------------- | ----------------------------- | --------------------------------------------------------------------------------- |
-| Content-Security-Policy | `proxy.ts`, `lib/security.ts` | Scripts only from the site and the request nonce; images only from the site and the ImageKit folder; no framing, plugins, or foreign form targets |
+| Content-Security-Policy | `proxy.ts`, `lib/security.ts` | Scripts only from the site and the request nonce; images only from the site and the ImageKit folder; frames only from Calendly; no plugins, foreign form targets, or framing of this site |
 | Static headers        | `next.config.ts`              | HSTS, `nosniff`, `X-Frame-Options: DENY`, COOP, Referrer-Policy, Permissions-Policy |
 | Indexing control      | `lib/env.ts`                  | `noindex` everywhere until `SITE_INDEXABLE=true`, and always on preview deployments |
-| API input handling    | `lib/booking.ts`              | Same-origin, JSON-only, size-limited, schema-validated, honeypot, rate-limited    |
+| Booking messages      | `lib/calendly.ts`             | Only messages from `https://calendly.com` are trusted                             |
 | Supply chain          | `pnpm-workspace.yaml`, CI     | 7-day minimum release age, install scripts allowlisted, `pnpm audit` in CI, actions pinned to commits |
 
-`style-src` allows `'unsafe-inline'` because the hero animation delays and the navigation highlight use inline style attributes, which nonces cannot cover. `script-src` never allows inline scripts.
+`style-src` allows `'unsafe-inline'` because the hero animation delays and the navigation highlight use inline style attributes, which nonces cannot cover. `script-src` never allows inline or third-party scripts.
 
-The site sets no cookies and loads no analytics or third-party scripts. Adding any of these requires a CSP change, a Privacy Policy update, and possibly a consent banner. See [SECURITY.md](../SECURITY.md).
+The site itself sets no cookies and loads no analytics or third-party scripts. Calendly's scheduler, which loads only when a visitor opens the booking dialog, sets its own cookies inside its frame and shows its own consent banner where required (it is deliberately not hidden). Adding any other third-party service requires a CSP change, a Privacy Policy update, and possibly a consent banner. See [SECURITY.md](../SECURITY.md).
 
 ## Images
 
@@ -137,11 +128,12 @@ Hand-written CSS with design tokens, no CSS framework. All files in `app/styles/
 
 | File             | Covers                                                                        |
 | ---------------- | ----------------------------------------------------------------------------- |
-| `globals.css`    | Design tokens (`:root`), base elements, buttons, and most homepage sections, booking, and legal pages |
+| `globals.css`    | Design tokens (`:root`), base elements, buttons, most homepage sections, and legal pages |
 | `agents.css`     | Agents section, the illustrative workspace, and the IGV family bar            |
 | `tools.css`      | Tool logos, the integration map, and bento cards                              |
 | `navigation.css` | Header, services menu, and mobile drawer                                      |
 | `directory.css`  | Agent directory                                                               |
+| `booking.css`    | Booking dialog: navy brand panel beside the Calendly scheduler, stacking on narrow screens |
 | `polish.css`     | Final refinements that override earlier files; must stay last                 |
 
 Conventions used across components:
@@ -186,8 +178,7 @@ Structured data is generated from the same content the page shows, so it can't d
 | `legal.test.tsx`       | Every legal page renders, dates and contact present, carrier-required SMS phrases |
 | `seo.test.ts`          | Metadata, structured data, robots, sitemap, environment handling              |
 | `security.test.ts`     | CSP directives and security headers                                          |
-| `booking.test.ts`      | Every rejection path and upstream outcome of the booking API, with mocked network |
-| `rate-limit.test.ts`   | In-memory and Redis limiters, hashing, fail-closed behavior                   |
+| `calendly.test.ts`     | Embed URL (pre-fill, appearance, cookie banner kept), trusted-origin message handling, frame-src |
 | `assets.test.ts`       | Image URLs; with `pnpm test:assets`, that every image exists in ImageKit      |
 
-Tests never call the real booking service. Components are rendered with `react-dom/server`, so tests check the same HTML search engines receive.
+Tests never call Calendly or create bookings. Components are rendered with `react-dom/server`, so tests check the same HTML search engines receive.

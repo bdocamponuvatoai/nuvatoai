@@ -91,8 +91,4 @@ describe('deployment environment', () => {
     expect(readSiteEnv({ SITE_INDEXABLE: 'true', VERCEL_ENV: 'production' }).indexable).toBe(true);
     expect(readSiteEnv({ SITE_INDEXABLE: 'true', VERCEL_ENV: 'preview' }).indexable).toBe(false);
   });
-
-  it('defaults the booking service to nuvato.ai', () => {
-    expect(readSiteEnv({}).bookingServiceOrigin).toBe('https://nuvato.ai');
-  });
 });

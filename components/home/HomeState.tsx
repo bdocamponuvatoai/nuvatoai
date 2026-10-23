@@ -1,16 +1,10 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import type { SchedulingDetails } from '@/lib/calendly';
 
-export type ContactDetails = {
-  name: string;
-  email: string;
-  company: string;
-  service: string;
-  message: string;
-  /** Honeypot value, forwarded so the server can reject bots. */
-  website?: string;
-};
+/** What the consultation form collects; passed to Calendly to pre-fill the booking form. */
+export type ContactDetails = SchedulingDetails;
 
 /** A service or agent picked elsewhere on the page. `key` changes on every pick. */
 export type ServiceSelection = { service: string; agent: string; key: number };

@@ -24,8 +24,6 @@ export function readSiteEnv(env: Env = process.env) {
      */
     indexable:
       env.SITE_INDEXABLE === 'true' && (!env.VERCEL_ENV || env.VERCEL_ENV === 'production'),
-    /** Upstream booking service that owns availability, hosts, and calendar invitations. */
-    bookingServiceOrigin: originOf(env.BOOKING_SERVICE_ORIGIN?.trim() || 'https://nuvato.ai'),
   };
 }
 
