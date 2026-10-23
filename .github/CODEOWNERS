@@ -1,0 +1,18 @@
+# Code owners are requested for review automatically. With branch protection
+# requiring code-owner review, their approval is needed to merge.
+# Add team members here as the team grows: one pattern per line, last match wins.
+
+*                   @bdocamponuvatoai
+
+# Security-sensitive areas (see SECURITY.md).
+/lib/security.ts    @bdocamponuvatoai
+/lib/booking.ts     @bdocamponuvatoai
+/lib/rate-limit.ts  @bdocamponuvatoai
+/lib/env.ts         @bdocamponuvatoai
+/proxy.ts           @bdocamponuvatoai
+/next.config.ts     @bdocamponuvatoai
+/app/api/           @bdocamponuvatoai
+/.github/           @bdocamponuvatoai
+
+# Legal copy, including carrier-registered SMS terms.
+/lib/legal-content.ts  @bdocamponuvatoai

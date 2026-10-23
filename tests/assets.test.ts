@@ -34,7 +34,11 @@ describe('ImageKit asset URLs', () => {
  * Network check that every registered asset exists in ImageKit with the expected type.
  * Run with `pnpm test:assets` (CI runs it too); skipped in the regular unit suite.
  */
-describe.runIf(import.meta.env.MODE === 'remote-assets')('ImageKit library', () => {
+// A cold CDN cache can make the first request slow. Retries absorb that; a missing
+// file still fails, because a 404 fails every attempt.
+const network = { timeout: 15_000, retry: 2 };
+
+describe.runIf(import.meta.env.MODE === 'remote-assets')('ImageKit library', network, () => {
   const contentTypes: Record<string, string> = {
     '.png': 'image/png',
     '.webp': 'image/webp',
