@@ -1,0 +1,446 @@
+/*
+ * Booking dialog (components/home/Booking.tsx): a navy brand panel beside the embedded
+ * Calendly scheduler. Stacks into a compact header above the scheduler on narrow screens.
+ * Colors follow the design tokens in globals.css and the contact section's dark panel.
+ */
+
+.booking-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  width: min(1040px, 100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  color: var(--navy);
+  background: #fff;
+  box-shadow: 0 40px 140px #030b3266;
+}
+.booking-dialog::backdrop {
+  background: rgb(10 18 48 / 0.45);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.booking-layout {
+  display: grid;
+}
+
+/* Close button: sits over the white scheduler on wide screens, the navy header on narrow ones. */
+.booking-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #ffffff2e;
+  background: #ffffff14;
+  color: #fff;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+}
+.booking-close:hover {
+  background: #ffffff26;
+}
+
+/* Brand panel */
+.booking-brand {
+  display: flex;
+  flex-direction: column;
+  padding: 22px 20px 24px;
+  color: #fff;
+  background: radial-gradient(ellipse at 0% 100%, #1a56f0 0%, #0e1c47 42%, #0a1230 78%);
+}
+.booking-lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+/* The blue mark sits on a white tile so it stays visible against the navy panel. */
+.booking-mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow:
+    0 6px 18px #02092a59,
+    inset 0 -2px 0 #dfe7f6;
+}
+.booking-mark img {
+  width: 28px;
+  height: 28px;
+}
+.booking-lockup b {
+  color: #94b6ff;
+  font-weight: 500;
+}
+.booking-eyebrow {
+  margin-top: 22px;
+  color: #94b6ff;
+  letter-spacing: 0.08em;
+}
+.booking-brand h2 {
+  margin-top: 8px;
+  color: #fff;
+  font-size: 27px;
+  line-height: 1.12;
+}
+.booking-brand h2 em {
+  color: #94b6ff;
+}
+.booking-intro {
+  margin-top: 10px;
+  color: #b9c9e7;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.booking-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+.booking-facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid #ffffff26;
+  border-radius: 999px;
+  background: #ffffff0d;
+  color: #e6edfb;
+  font-size: 13px;
+}
+/* On narrow screens: one compact row (name · company, then "Edit details"). */
+.booking-for {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 12px;
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid #ffffff1f;
+  border-radius: 14px;
+  background: #ffffff0a;
+}
+.booking-for > .mono {
+  grid-column: 1 / -1;
+  color: #8fa6d6;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+.booking-for p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  color: #c9d6f0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.booking-for p > span:last-child {
+  display: none;
+}
+.booking-for strong {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+}
+.booking-for button {
+  min-height: 32px;
+  padding: 0;
+  color: #94b6ff;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* The steps and trust note need room; they appear from the two-column layout up. */
+.booking-steps,
+.booking-trust {
+  display: none;
+}
+
+/* Scheduler panel */
+.booking-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 20px 16px 22px;
+}
+.booking-main-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.booking-main-heading .mono {
+  color: var(--slate);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+.booking-main-heading span {
+  color: var(--mist);
+  font-size: 13px;
+}
+.booking-scheduler {
+  position: relative;
+  min-height: 420px;
+  margin: 8px -8px 0;
+}
+.booking-scheduler iframe {
+  display: block;
+  width: 100%;
+  min-width: 300px;
+  border: 0;
+  transition: opacity 0.2s;
+}
+.booking-scheduler[data-loading] iframe {
+  opacity: 0;
+}
+.booking-loading {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-block: 90px;
+  color: #7185a8;
+  font-size: 14px;
+}
+.booking-spinner {
+  animation: booking-spin 1s linear infinite;
+}
+@keyframes booking-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.booking-unavailable {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid #f3e5c9;
+  border-radius: 12px;
+  background: #fff8ed;
+  color: #86643b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.booking-unavailable a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  margin-top: 6px;
+  color: var(--blue);
+  font-weight: 600;
+}
+.booking-legal {
+  margin-top: 14px;
+  color: var(--mist);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.booking-legal a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Confirmation */
+.booking-confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 440px;
+  margin: auto;
+  padding: 28px 4px;
+  text-align: center;
+}
+.booking-confirmation-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #dff6ec;
+  color: #2b9971;
+}
+.booking-confirmation h3 {
+  margin-top: 22px;
+  font-size: 24px;
+}
+.booking-confirmation p {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.booking-confirmation strong {
+  color: var(--navy);
+}
+.booking-confirmation ul {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  margin-top: 22px;
+  padding: 16px 18px;
+  border: 1px solid #e1eaf9;
+  border-radius: 14px;
+  background: #f6f9ff;
+  text-align: left;
+}
+.booking-confirmation li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #51698e;
+  font-size: 14px;
+}
+.booking-confirmation small {
+  margin-top: 16px;
+  color: var(--mist);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.booking-confirmation .button {
+  width: 100%;
+  margin-top: 24px;
+}
+
+/* Two columns: brand panel beside the scheduler. */
+@media (min-width: 880px) {
+  .booking-layout {
+    grid-template-columns: 340px minmax(0, 1fr);
+    min-height: min(720px, 100dvh - 32px);
+  }
+  .booking-brand {
+    padding: 30px 30px 28px;
+  }
+  .booking-mark {
+    width: 44px;
+    height: 44px;
+  }
+  .booking-mark img {
+    width: 30px;
+    height: 30px;
+  }
+  .booking-eyebrow {
+    margin-top: 44px;
+  }
+  .booking-brand h2 {
+    font-size: 34px;
+  }
+  /* Full card: name, company, and email on separate lines. */
+  .booking-for {
+    display: block;
+    margin-top: 26px;
+    padding: 14px 16px;
+  }
+  .booking-for p {
+    display: grid;
+    gap: 2px;
+    margin-top: 6px;
+  }
+  .booking-for p > span:last-child {
+    display: inline;
+  }
+  .booking-for button {
+    margin-top: 6px;
+  }
+  .booking-steps {
+    display: grid;
+    gap: 12px;
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .booking-steps li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #dbe5f7;
+    font-size: 14px;
+  }
+  .booking-steps li > span {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ffffff24;
+    border-radius: 7px;
+    background: #ffffff08;
+    color: #94b6ff;
+    font-size: 11px;
+  }
+  .booking-trust {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 28px;
+    color: #9cb2db;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .booking-trust svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .booking-main {
+    padding: 30px 32px 24px;
+  }
+  .booking-main-heading {
+    padding-right: 52px;
+  }
+  .booking-scheduler {
+    margin: 10px -14px 0;
+  }
+  .booking-close {
+    top: 20px;
+    right: 20px;
+    border-color: #e1e7f2;
+    background: #fff;
+    color: var(--slate);
+  }
+  .booking-close:hover {
+    border-color: #b9c7e2;
+    background: #fff;
+    color: var(--navy);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking-close,
+  .booking-scheduler iframe {
+    transition: none;
+  }
+  .booking-spinner {
+    animation: none;
+  }
+}
+
+@media print {
+  .booking-dialog {
+    display: none;
+  }
+}

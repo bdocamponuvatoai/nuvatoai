@@ -1,17 +1,21 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowUpRight,
-  CalendarDays,
+  BadgeCheck,
   Check,
   Clock3,
   LoaderCircle,
   ShieldCheck,
+  Video,
   X,
 } from 'lucide-react';
+import { images } from '@/lib/assets';
 import { calendlyEmbedUrl, parseCalendlyHeight, readCalendlyEvent } from '@/lib/calendly';
+import { consultationSteps } from '@/lib/content';
 import { siteConfig } from '@/lib/site-config';
 import { useHomeState, type ContactDetails } from './HomeState';
 
@@ -22,6 +26,12 @@ const INITIAL_HEIGHT = 700;
 const MIN_HEIGHT = 420;
 /** If Calendly hasn't loaded by then (offline, or blocked by an extension), offer a direct link. */
 const LOAD_TIMEOUT_MS = 15_000;
+
+const MEETING_FACTS = [
+  { Icon: Clock3, label: `${consultation.minutes} minutes` },
+  { Icon: Video, label: 'Google Meet' },
+  { Icon: BadgeCheck, label: 'No commitment' },
+];
 
 type Status = 'loading' | 'ready' | 'unavailable' | 'scheduled';
 
@@ -43,21 +53,9 @@ function useModalDialog() {
   return dialog;
 }
 
-/**
- * Embedded Calendly scheduler, pre-filled with the consultation form's answers. Calendly
- * creates the appointment and sends the confirmation and calendar invitation; this
- * component only shows the result.
- */
-function Booking({ details, onClose }: { details: ContactDetails; onClose: () => void }) {
-  const dialog = useModalDialog();
-  const [status, setStatus] = useState<Status>('loading');
+/** Follows Calendly's postMessage events: its content height, and a confirmed booking. */
+function useCalendlyEvents(onScheduled: () => void) {
   const [height, setHeight] = useState(INITIAL_HEIGHT);
-  // Rendered only after the visitor opens the dialog, so `window` is available.
-  const src = useMemo(
-    () => calendlyEmbedUrl(consultation.calendlyUrl, details, window.location.host),
-    [details],
-  );
-
   useEffect(() => {
     function onMessage(message: MessageEvent) {
       const calendly = readCalendlyEvent(message);
@@ -66,12 +64,133 @@ function Booking({ details, onClose }: { details: ContactDetails; onClose: () =>
         const pixels = parseCalendlyHeight((calendly.payload as { height?: unknown })?.height);
         if (pixels) setHeight(Math.max(pixels, MIN_HEIGHT));
       } else if (calendly.event === 'calendly.event_scheduled') {
-        setStatus('scheduled');
+        onScheduled();
       }
     }
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, []);
+  }, [onScheduled]);
+  return height;
+}
+
+/** Left panel: the Nuvato brand, what the call is, who it's for, and what happens next. */
+function BrandPanel({
+  details,
+  scheduled,
+  onEdit,
+}: {
+  details: ContactDetails;
+  scheduled: boolean;
+  onEdit: () => void;
+}) {
+  return (
+    <aside className="booking-brand">
+      <div className="booking-lockup">
+        <span className="booking-mark">
+          <Image src={images.brandMark} width={32} height={32} alt="" preload />
+        </span>
+        <span>
+          Nuvato<b> AI</b>
+        </span>
+      </div>
+
+      <p className="booking-eyebrow mono">BOOK A CONSULTATION</p>
+      <h2 id="booking-title">
+        {scheduled ? (
+          <>
+            You’re <em>booked.</em>
+          </>
+        ) : (
+          <>
+            Book your <em>{consultation.name.toLowerCase()}.</em>
+          </>
+        )}
+      </h2>
+      <p className="booking-intro">A real conversation about what could work better.</p>
+
+      <ul className="booking-facts">
+        {MEETING_FACTS.map(({ Icon, label }) => (
+          <li key={label}>
+            <Icon size={15} aria-hidden="true" />
+            {label}
+          </li>
+        ))}
+      </ul>
+
+      <div className="booking-for">
+        <span className="mono">BOOKING FOR</span>
+        <p>
+          <strong>{details.name}</strong>
+          <span>{details.company}</span>
+          <span>{details.email}</span>
+        </p>
+        {!scheduled && (
+          <button type="button" onClick={onEdit}>
+            Edit details
+          </button>
+        )}
+      </div>
+
+      <ol className="booking-steps">
+        {consultationSteps.map((step, i) => (
+          <li key={step}>
+            <span className="mono">0{i + 1}</span>
+            {step}
+          </li>
+        ))}
+      </ol>
+
+      <p className="booking-trust">
+        <ShieldCheck size={14} aria-hidden="true" />
+        Your details go only to Nuvato AI and our scheduling provider, Calendly.
+      </p>
+    </aside>
+  );
+}
+
+function Confirmation({ email, onClose }: { email: string; onClose: () => void }) {
+  return (
+    <div className="booking-confirmation" role="status">
+      <span className="booking-confirmation-icon">
+        <Check size={30} aria-hidden="true" />
+      </span>
+      <h3>Your {consultation.name.toLowerCase()} is confirmed.</h3>
+      <p>
+        A confirmation and calendar invitation are on their way to <strong>{email}</strong>.
+      </p>
+      <ul>
+        <li>
+          <Clock3 size={15} aria-hidden="true" />
+          {consultation.name} · {consultation.minutes} minutes
+        </li>
+        <li>
+          <Video size={15} aria-hidden="true" />
+          The Google Meet link is in your invitation
+        </li>
+      </ul>
+      <small>Need to change the time? Use the reschedule link in your confirmation email.</small>
+      <button type="button" className="button button-primary" onClick={onClose}>
+        Done
+        <Check size={16} aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Booking dialog: the Nuvato brand panel beside an embedded Calendly scheduler,
+ * pre-filled with the consultation form's answers. Calendly creates the appointment and
+ * sends the confirmation and calendar invitation; this component only shows the result.
+ */
+function Booking({ details, onClose }: { details: ContactDetails; onClose: () => void }) {
+  const dialog = useModalDialog();
+  const [status, setStatus] = useState<Status>('loading');
+  const height = useCalendlyEvents(useCallback(() => setStatus('scheduled'), []));
+  // Rendered only after the visitor opens the dialog, so `window` is available.
+  const src = useMemo(
+    () => calendlyEmbedUrl(consultation.calendlyUrl, details, window.location.host),
+    [details],
+  );
 
   useEffect(() => {
     if (status !== 'loading') return;
@@ -94,79 +213,56 @@ function Booking({ details, onClose }: { details: ContactDetails; onClose: () =>
         if (event.target === dialog.current) onClose();
       }}
     >
-      <div className="booking-shell">
-        <div className="booking-header">
-          <span className="booking-symbol">
-            <CalendarDays size={23} />
-          </span>
-          <button className="icon-button" onClick={onClose} aria-label="Close booking">
-            <X size={21} />
-          </button>
-        </div>
-        <h2 id="booking-title">{scheduled ? 'You’re booked.' : 'Let’s find a time.'}</h2>
-        <p className="booking-subtitle">
-          {scheduled
-            ? `A confirmation and calendar invitation are on their way to ${details.email}.`
-            : 'A real conversation about what could work better.'}
-        </p>
+      <button type="button" className="booking-close" onClick={onClose} aria-label="Close booking">
+        <X size={20} aria-hidden="true" />
+      </button>
 
-        {scheduled ? (
-          <>
-            <div className="booking-summary">
-              <div className="booking-success">
-                <Check size={26} />
-              </div>
-              <h3>{consultation.name}</h3>
-              <p>
-                <Clock3 size={16} />
-                {consultation.minutes} minutes · Google Meet
-              </p>
-              <small>
-                Your confirmation email has the time, the meeting link, and options to reschedule or
-                cancel.
-              </small>
-            </div>
-            <button className="button button-primary booking-next" onClick={onClose}>
-              Done
-              <Check size={16} />
-            </button>
-          </>
-        ) : (
-          <>
-            <p className="booking-meeting">
-              <Clock3 size={14} />
-              {consultation.name} · {consultation.minutes} minutes
-            </p>
+      <div className="booking-layout">
+        <BrandPanel details={details} scheduled={scheduled} onEdit={onClose} />
 
-            {status === 'unavailable' ? (
-              <div className="booking-error" role="alert">
-                <p>The scheduler is taking too long to load. You can book on Calendly directly.</p>
-                <a href={consultation.calendlyUrl} target="_blank" rel="noopener noreferrer">
-                  Open the scheduling page
-                  <ArrowUpRight size={14} />
-                </a>
+        <section
+          className="booking-main"
+          aria-label={scheduled ? 'Booking confirmed' : 'Choose a time'}
+        >
+          {scheduled ? (
+            <Confirmation email={details.email} onClose={onClose} />
+          ) : (
+            <>
+              <div className="booking-main-heading">
+                <p className="mono">CHOOSE A TIME</p>
+                <span>Times are shown in your time zone.</span>
               </div>
-            ) : (
-              <div className="booking-scheduler" data-loading={status === 'loading' || undefined}>
-                {status === 'loading' && (
-                  <div className="booking-loading" role="status">
-                    <LoaderCircle className="spin" size={24} />
-                    Loading live availability…
-                  </div>
-                )}
-                <iframe
-                  src={src}
-                  title={`Schedule a ${consultation.name} with Nuvato AI`}
-                  height={height}
-                  onLoad={() => setStatus('ready')}
-                />
-              </div>
-            )}
 
-            <div className="booking-privacy">
-              <p>
+              {status === 'unavailable' ? (
+                <div className="booking-unavailable" role="alert">
+                  <p>
+                    The scheduler is taking too long to load. You can book on Calendly directly.
+                  </p>
+                  <a href={consultation.calendlyUrl} target="_blank" rel="noopener noreferrer">
+                    Open the scheduling page
+                    <ArrowUpRight size={15} aria-hidden="true" />
+                  </a>
+                </div>
+              ) : (
+                <div className="booking-scheduler" data-loading={status === 'loading' || undefined}>
+                  {status === 'loading' && (
+                    <div className="booking-loading" role="status">
+                      <LoaderCircle className="booking-spinner" size={24} aria-hidden="true" />
+                      Loading live availability…
+                    </div>
+                  )}
+                  <iframe
+                    src={src}
+                    title={`Schedule a ${consultation.name} with Nuvato AI`}
+                    height={height}
+                    onLoad={() => setStatus('ready')}
+                  />
+                </div>
+              )}
+
+              <p className="booking-legal">
                 Scheduling is provided by Calendly, which receives the details you entered to fill
-                in the booking form. By booking, you agree to the{' '}
+                in its booking form. By booking, you agree to the{' '}
                 <Link href="/terms/" target="_blank" rel="noopener noreferrer">
                   Terms
                 </Link>{' '}
@@ -176,14 +272,9 @@ function Booking({ details, onClose }: { details: ContactDetails; onClose: () =>
                 </Link>
                 . This does not enroll you in SMS.
               </p>
-            </div>
-          </>
-        )}
-
-        <div className="booking-footer">
-          <ShieldCheck size={13} />
-          Your details go only to Nuvato AI and our scheduling provider, Calendly.
-        </div>
+            </>
+          )}
+        </section>
       </div>
     </dialog>
   );

@@ -90,7 +90,7 @@ How it fits together (`components/home/Booking.tsx`, `lib/calendly.ts`):
 
 - **Embedded as a plain iframe, without Calendly's `widget.js`.** Loading third-party script would mean loosening the CSP's `script-src`. The iframe needs only `frame-src https://calendly.com`.
 - **Pre-filled.** `calendlyEmbedUrl()` passes the visitor's name and email, plus the company, services, and project notes as custom answers `a1`–`a3`. These map to the Calendly event type's questions **in order**, so keep them as 1. Company, 2. Services of interest, 3. Project details.
-- **Matches the site.** The same URL sets Calendly's colors to the design tokens and hides the event details the dialog already shows.
+- **Matches the site.** The same URL sets Calendly's colors to the design tokens and hides the event details the dialog already shows. The dialog itself pairs a navy brand panel (logo, meeting facts, who is booking, next steps) with the scheduler, and stacks into a compact header on narrow screens.
 - **Trusted messages only.** Calendly reports the page height and a confirmed booking with `postMessage`. `readCalendlyEvent()` ignores any message not from exactly `https://calendly.com`, so another page or frame can't fake a confirmed booking.
 - **Graceful failure.** If the scheduler hasn't loaded within 15 seconds (offline, or blocked by a browser extension), the dialog offers a direct link to the Calendly page.
 - **Nothing is stored by this site.** Answers stay in browser memory until the scheduler opens, and then go only to Calendly.
@@ -128,11 +128,12 @@ Hand-written CSS with design tokens, no CSS framework. All files in `app/styles/
 
 | File             | Covers                                                                        |
 | ---------------- | ----------------------------------------------------------------------------- |
-| `globals.css`    | Design tokens (`:root`), base elements, buttons, and most homepage sections, booking, and legal pages |
+| `globals.css`    | Design tokens (`:root`), base elements, buttons, most homepage sections, and legal pages |
 | `agents.css`     | Agents section, the illustrative workspace, and the IGV family bar            |
 | `tools.css`      | Tool logos, the integration map, and bento cards                              |
 | `navigation.css` | Header, services menu, and mobile drawer                                      |
 | `directory.css`  | Agent directory                                                               |
+| `booking.css`    | Booking dialog: navy brand panel beside the Calendly scheduler, stacking on narrow screens |
 | `polish.css`     | Final refinements that override earlier files; must stay last                 |
 
 Conventions used across components:

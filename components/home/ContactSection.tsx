@@ -1,7 +1,6 @@
 import { Clock3 } from 'lucide-react';
+import { consultationSteps } from '@/lib/content';
 import Inquiry from './Inquiry';
-
-const NEXT_STEPS = ['Share what you need', 'We scope the work', 'Fixed price before work starts'];
 
 export default function ContactSection() {
   return (
@@ -21,7 +20,7 @@ export default function ContactSection() {
           </h2>
           <p>Start with the bottleneck, the idea, or the thing your team keeps working around.</p>
           <ol>
-            {NEXT_STEPS.map((step, i) => (
+            {consultationSteps.map((step, i) => (
               <li key={step}>
                 <span className="mono">0{i + 1}</span>
                 {step}

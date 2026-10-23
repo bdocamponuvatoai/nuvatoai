@@ -165,6 +165,13 @@ export const agents = [
     review: true,
   },
 ];
+/** What happens after someone books a consultation (contact section and booking dialog). */
+export const consultationSteps = [
+  'Share what you need',
+  'We scope the work',
+  'Fixed price before work starts',
+];
+
 export const processSteps = [
   {
     title: 'Discover & scope',

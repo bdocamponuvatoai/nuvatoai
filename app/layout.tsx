@@ -8,6 +8,7 @@ import './styles/agents.css';
 import './styles/tools.css';
 import './styles/navigation.css';
 import './styles/directory.css';
+import './styles/booking.css';
 import './styles/polish.css';
 
 const inter = localFont({

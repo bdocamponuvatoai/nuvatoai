@@ -62,16 +62,6 @@ dd {
     0 12px 34px -10px rgb(26 86 240 / 0.6);
 }
 
-/* Dialog backdrops blur what's behind them instead of only dimming it */
-.booking-dialog {
-  border-radius: 24px;
-}
-.booking-dialog::backdrop {
-  background: rgb(10 18 48 / 0.35);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-}
-
 /* 404 and error pages */
 .status-page {
   min-height: 70vh;
@@ -203,9 +193,7 @@ body {
   .navigation-dropdown {
     max-height: calc(100vh - 120px);
   }
-  .booking-dialog {
-    max-height: calc(100vh - 48px);
-  }
+
   @media (min-width: 600px) {
     .navigation-drawer {
       height: auto;
