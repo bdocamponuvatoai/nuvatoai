@@ -15,7 +15,7 @@ pnpm dev               # http://localhost:3000
 
 No environment variables are needed for local development. See [`.env.example`](.env.example) for what each one does.
 
-> The booking form talks to the **live** booking service. You can browse the calendar safely, but **confirming a booking creates a real appointment.**
+> The booking dialog shows the **live** Calendly calendar. You can browse it safely, but **confirming a time creates a real appointment.** Cancel any test booking from the Calendly confirmation email.
 
 ## Workflow
 
@@ -84,6 +84,15 @@ Agents with `review: true` show "Description for client review" and are left out
 
 Never add images to the repository. Only app icons (`app/favicon.ico`, `app/icon*.png`, `app/apple-icon.png`) live here.
 
+### Change the booking setup
+
+Bookings are handled by Calendly (see [ARCHITECTURE.md](docs/ARCHITECTURE.md#booking-flow)).
+
+- **Hours, buffers, reminders, and notice periods** are set in the Calendly dashboard. No code change is needed.
+- **The event link, name, or duration** are in `siteConfig.consultation` (`lib/site-config.ts`). Update them if the Calendly event type changes. The link must stay on `https://calendly.com`.
+- **Booking questions** must stay in this order, because the site pre-fills them by position (`a1`–`a3` in `lib/calendly.ts`): 1. Company, 2. Services of interest, 3. Project details. If you add or reorder questions, update `calendlyEmbedUrl()` and `tests/calendly.test.ts`.
+- **Never add a phone-number question or text reminders.** The form, the booking dialog, and the Privacy Policy all state that booking doesn't collect a phone number or enroll anyone in SMS, and the SMS carrier registration depends on it.
+
 ### Add a page
 
 1. Create `app/<route>/page.tsx` and export `metadata` using `pageMetadata()` from `lib/seo.ts`.
@@ -110,7 +119,7 @@ This affects security and privacy, so plan it in the pull request description:
 
 - Allow its domain in the CSP (`lib/security.ts`) for exactly the directive it needs.
 - Update the Privacy Policy if it receives visitor data, and add a consent mechanism if it sets non-essential cookies.
-- Keep credentials on the server, in API routes. Never expose them through `NEXT_PUBLIC_` variables.
+- Keep any credentials on the server (a route handler or server component). Never expose them through `NEXT_PUBLIC_` variables.
 
 ## Dependencies
 
