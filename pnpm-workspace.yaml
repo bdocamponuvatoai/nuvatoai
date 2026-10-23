@@ -6,3 +6,13 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+
+# Security patches for transitive dependencies whose parents still request a
+# vulnerable version. Each applies only to the vulnerable range and stays within
+# the same major version. Remove an entry once `pnpm audit` passes without it.
+overrides:
+  vite@<8.1.6: ^8.1.6 # via vitest (dev only)
+  esbuild@<0.28.1: ^0.28.1 # via vitest (dev only)
+  brace-expansion@>=5 <5.0.12: ^5.0.12 # via eslint plugins (dev only)
+  browserslist@<4.28.7: ^4.28.7 # via next > styled-jsx and eslint plugins
+  baseline-browser-mapping@<2.11.0: ^2.11.0 # via next and eslint plugins
