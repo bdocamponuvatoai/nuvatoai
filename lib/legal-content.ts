@@ -11,8 +11,8 @@ const link = (url: string) => `[${url}](${url})`;
 /** Publication details shown on each legal page. Update `updated` and `version` whenever the text changes. */
 export const legalMeta = {
   effective: 'October 17, 2026',
-  updated: 'October 17, 2026',
-  version: '1.1',
+  updated: 'October 24, 2026',
+  version: '1.2',
   /** Website SMS enrollment is not offered; the SMS terms apply only to a separate opt-in. */
   smsEnrollmentEnabled: false,
 } as const;
@@ -77,9 +77,9 @@ const privacy: LegalDocument = {
       id: 'information',
       title: 'Information we collect',
       bullets: [
-        'Consultation details you enter: full name, work email, company, the services you are interested in, optional project notes, and your chosen appointment type, date, and time.',
+        'Consultation details you enter: full name, work email, company, the services you are interested in, optional project notes, and the consultation time you choose.',
         'Technical information that our hosting and security providers process to operate the website, such as IP address, browser and device type, request times, and security events.',
-        'Abuse-prevention counters: short-lived, one-way hashes of an email address and connection IP with an attempt count. No raw IP address or form content is stored in these counters.',
+        'Scheduling information that Calendly, our scheduling provider, collects through its booking form when you choose a time, as described in Calendly’s own privacy notice.',
         'Only if you separately opt in to text messages: your mobile number, the consent you gave and when, messages exchanged, delivery information, and opt-out requests.',
       ],
       paragraphs: [
@@ -113,10 +113,10 @@ const privacy: LegalDocument = {
       highlight:
         'SMS consent is not shared with third parties or affiliates. All of the categories below exclude text-messaging originator opt-in data and consent; this information will not be shared with any third parties.',
       paragraphs: [
-        'We share other personal information only with service providers that help us operate the website and deliver what you request, such as hosting, booking, calendar, and email providers. They may use it only to provide their services to us.',
+        'We share other personal information only with service providers that help us operate the website and deliver what you request, such as hosting, scheduling, calendar, and email providers. They may use it only to provide their services to us.',
       ],
       bullets: [
-        'When you confirm a consultation, the details needed for that appointment are sent to our booking service to create your appointment and calendar invitation.',
+        'When you choose a time, the details you entered (name, email, company, services, and project notes) are passed to Calendly, our scheduling provider, to fill in its booking form. Calendly creates your appointment only when you confirm it, and sends the confirmation and calendar invitation.',
         'We may disclose information when required by law, to respond to valid legal process, or to protect the rights, safety, and security of Nuvato AI, our clients, or others.',
         'If Nuvato AI is involved in a merger, acquisition, or sale of assets, information may be transferred as part of that transaction, subject to this policy.',
       ],
@@ -136,8 +136,9 @@ const privacy: LegalDocument = {
       id: 'cookies',
       title: 'Cookies and tracking',
       paragraphs: [
-        'This website does not use advertising cookies, analytics trackers, or cross-site tracking pixels, and it does not store consultation details in your browser’s storage. Form entries stay in page memory until you confirm a booking or leave the page.',
-        'Our hosting platform may use strictly necessary cookies or similar technology for security and to deliver the site. Because no non-essential tracking is used, no cookie banner is shown. If that changes, we will update this policy and ask for your consent first.',
+        'This website does not use advertising cookies, analytics trackers, or cross-site tracking pixels, and it does not store consultation details in your browser’s storage. Form entries stay in page memory until you choose a time or leave the page.',
+        'Our hosting platform may use strictly necessary cookies or similar technology for security and to deliver the site. Because this website itself uses no non-essential tracking, it shows no cookie banner. If that changes, we will update this policy and ask for your consent first.',
+        'The booking scheduler is provided by Calendly and shown in a frame from calendly.com, which loads only when you choose to schedule a consultation. Calendly may set its own cookies within that frame under its own cookie notice, and asks for your consent where required.',
         'Browser privacy signals such as Global Privacy Control are honored as a request to opt out of the sale or sharing of personal information. Since we do neither, no further action is needed.',
       ],
     },
@@ -148,7 +149,6 @@ const privacy: LegalDocument = {
         'Inquiry and booking information: 2 years after your last contact with us, then deleted or de-identified.',
         'Client project records: for the duration of the engagement and afterwards as required by the written agreement and by tax, accounting, or other legal obligations.',
         'Text-message consent and opt-out records: for as long as you are enrolled, and up to 4 years after messaging ends, so we can demonstrate consent and continue to honor opt-outs.',
-        'Abuse-prevention counters: they expire after 15 minutes and are removed during later booking activity.',
         'Hosting and security logs: kept by our providers under their own retention schedules.',
       ],
       paragraphs: [
@@ -159,7 +159,7 @@ const privacy: LegalDocument = {
       id: 'security',
       title: 'How we protect information',
       paragraphs: [
-        'The website uses HTTPS, strict security headers, server-side validation, and rate limiting. Booking details are never placed in web addresses, and no appointment is created until you explicitly confirm it.',
+        'The website uses HTTPS and strict security headers, and Calendly provides the scheduler over HTTPS. No appointment is created until you explicitly confirm a time.',
         'No website, email, or text-message channel can be completely secure. Text messages are not end-to-end encrypted, so never send passwords, security codes, financial credentials, or sensitive personal information by text.',
         'We do not collect biometric identifiers or biometric information, as defined by the Illinois Biometric Information Privacy Act. If a security breach affects your personal information, we will notify you as required by applicable law, including the Illinois Personal Information Protection Act.',
       ],
