@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
     loaderFile: './lib/imagekit-loader.ts',
   },
 
+  experimental: {
+    // Remind coding agents during `next dev`/`next build` when a security advisory
+    // affects the installed Next.js, and set the policy for `next upgrade --agent`.
+    agentUpgrade: 'security',
+  },
+
   async headers() {
     const robotsHeader = siteEnv.indexable
       ? []
