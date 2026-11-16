@@ -24,6 +24,12 @@ export function readSiteEnv(env: Env = process.env) {
      */
     indexable:
       env.SITE_INDEXABLE === 'true' && (!env.VERCEL_ENV || env.VERCEL_ENV === 'production'),
+    /**
+     * Offer analytics (and its consent banner) on production deployments only, so
+     * previews and local development never send data. ENABLE_ANALYTICS=true turns it on
+     * elsewhere for testing.
+     */
+    analyticsEnabled: env.VERCEL_ENV === 'production' || env.ENABLE_ANALYTICS === 'true',
   };
 }
 

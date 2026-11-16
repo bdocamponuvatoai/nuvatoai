@@ -7,23 +7,50 @@ type PolicyOptions = {
   development?: boolean;
   /** Extra image sources, such as the ImageKit endpoint. Paths limit them to one folder. */
   imageSources?: string[];
+  /** Allow Google Tag Manager and Google Analytics 4 (see components/analytics/). */
+  analytics?: boolean;
+};
+
+/**
+ * Sources the Google tag and Google Analytics 4 need, as documented by Google:
+ * https://developers.google.com/tag-platform/security/guides/csp
+ * The container (GTM-TFHD8F5M) holds only a GA4 tag; add a vendor's sources here only
+ * when a tag for it is added to the container.
+ */
+const GOOGLE_ANALYTICS_SOURCES = {
+  script: ['https://*.googletagmanager.com'],
+  img: ['https://*.google-analytics.com', 'https://*.googletagmanager.com'],
+  connect: [
+    'https://*.google-analytics.com',
+    'https://*.analytics.google.com',
+    'https://*.googletagmanager.com',
+  ],
 };
 
 /** Per-request Content-Security-Policy. Next.js reads the nonce from it and applies it to its own scripts. */
 export function contentSecurityPolicy(
   nonce: string,
-  { secure = true, development = false, imageSources = [] }: PolicyOptions = {},
+  { secure = true, development = false, imageSources = [], analytics = false }: PolicyOptions = {},
 ) {
+  const google = analytics ? GOOGLE_ANALYTICS_SOURCES : { script: [], img: [], connect: [] };
+  const directive = (name: string, ...sources: string[]) => [name, ...sources].join(' ');
+
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}'${development ? " 'unsafe-eval'" : ''}`,
+    directive(
+      'script-src',
+      "'self'",
+      `'nonce-${nonce}'`,
+      ...(development ? ["'unsafe-eval'"] : []),
+      ...google.script,
+    ),
     // Inline style attributes drive the hero animation delays and the navigation indicator.
     "style-src 'self' 'unsafe-inline'",
-    ["img-src 'self' data:", ...imageSources].join(' '),
+    directive('img-src', "'self'", 'data:', ...imageSources, ...google.img),
     "font-src 'self'",
     // The booking dialog embeds Calendly's scheduler. No Calendly script runs on our pages.
     `frame-src ${CALENDLY_ORIGIN}`,
-    "connect-src 'self'",
+    directive('connect-src', "'self'", ...google.connect),
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

@@ -1,14 +1,19 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
+import { headers } from 'next/headers';
 import { connection } from 'next/server';
+import Analytics from '@/components/analytics/Analytics';
+import { GTM_ID_PATTERN } from '@/lib/analytics';
 import { description, siteOrigin, socialImage, title } from '@/lib/seo';
 import { siteEnv } from '@/lib/env';
+import { siteConfig } from '@/lib/site-config';
 import './styles/globals.css';
 import './styles/agents.css';
 import './styles/tools.css';
 import './styles/navigation.css';
 import './styles/directory.css';
 import './styles/booking.css';
+import './styles/consent.css';
 import './styles/polish.css';
 
 const inter = localFont({
@@ -59,10 +64,21 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Every page carries a per-request CSP nonce (see proxy.ts), which requires dynamic rendering.
   await connection();
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+  const { gtmId } = siteConfig.analytics;
+  const analytics = siteEnv.analyticsEnabled && GTM_ID_PATTERN.test(gtmId);
 
   return (
-    <html lang="en" className={`${inter.variable} ${sora.variable} ${plexMono.variable}`}>
-      <body>{children}</body>
+    <html
+      lang="en"
+      className={`${inter.variable} ${sora.variable} ${plexMono.variable}`}
+      // Shows the "Cookie settings" footer links (see app/styles/consent.css).
+      data-analytics={analytics ? '' : undefined}
+    >
+      <body>
+        {children}
+        {analytics && <Analytics gtmId={gtmId} nonce={nonce} />}
+      </body>
     </html>
   );
 }

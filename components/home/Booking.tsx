@@ -13,6 +13,7 @@ import {
   Video,
   X,
 } from 'lucide-react';
+import { trackEvent } from '@/lib/analytics';
 import { images } from '@/lib/assets';
 import { calendlyEmbedUrl, parseCalendlyHeight, readCalendlyEvent } from '@/lib/calendly';
 import { consultationSteps } from '@/lib/content';
@@ -185,7 +186,12 @@ function Confirmation({ email, onClose }: { email: string; onClose: () => void }
 function Booking({ details, onClose }: { details: ContactDetails; onClose: () => void }) {
   const dialog = useModalDialog();
   const [status, setStatus] = useState<Status>('loading');
-  const height = useCalendlyEvents(useCallback(() => setStatus('scheduled'), []));
+  const onScheduled = useCallback(() => {
+    setStatus('scheduled');
+    // GA4's recommended lead event; no-op unless the visitor accepted analytics. No personal data.
+    trackEvent('generate_lead', { lead_source: 'consultation_booking' });
+  }, []);
+  const height = useCalendlyEvents(onScheduled);
   // Rendered only after the visitor opens the dialog, so `window` is available.
   const src = useMemo(
     () => calendlyEmbedUrl(consultation.calendlyUrl, details, window.location.host),

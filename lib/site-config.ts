@@ -6,6 +6,14 @@ export const siteConfig = {
   /** Existing client portal. */
   loginUrl: 'https://nuvato.ai/login',
   parentOrganizationUrl: 'https://isakglobalventures.com/',
+  /**
+   * Google Tag Manager container (Google Analytics 4). Public by design: it appears in every
+   * page that loads it. Loaded only in production and only after a visitor accepts analytics
+   * cookies; see components/analytics/.
+   */
+  analytics: {
+    gtmId: 'GTM-TFHD8F5M',
+  },
   /** The consultation booked through Calendly (see lib/calendly.ts). Must match the Calendly event type. */
   consultation: {
     name: 'Discovery call',

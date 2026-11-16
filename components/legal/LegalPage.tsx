@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowLeft, ArrowUpRight, ShieldCheck } from 'lucide-react';
+import CookieSettingsButton from '@/components/analytics/CookieSettingsButton';
 import BrandLogo from '@/components/BrandLogo';
 import { legalDocuments, legalMeta, type LegalDocument } from '@/lib/legal-content';
 
@@ -37,6 +38,7 @@ export function LegalFooter() {
             {document.title}
           </Link>
         ))}
+        <CookieSettingsButton />
       </nav>
     </footer>
   );

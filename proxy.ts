@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { imageKitEndpoint } from './lib/assets';
+import { siteEnv } from './lib/env';
 import { contentSecurityPolicy } from './lib/security';
 
 // A trailing slash makes the CSP source match everything under the folder, and nothing else.
@@ -12,11 +13,14 @@ export function proxy(request: NextRequest) {
     secure: request.nextUrl.protocol === 'https:',
     development: process.env.NODE_ENV === 'development',
     imageSources,
+    analytics: siteEnv.analyticsEnabled,
   });
 
-  // Next.js extracts the nonce from the request's CSP header during rendering.
+  // Next.js extracts the nonce from the request's CSP header for its own scripts;
+  // app/layout.tsx reads x-nonce to pass it to the Google tag's <Script> elements.
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('Content-Security-Policy', policy);
+  requestHeaders.set('x-nonce', nonce);
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set('Content-Security-Policy', policy);

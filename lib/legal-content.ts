@@ -11,8 +11,8 @@ const link = (url: string) => `[${url}](${url})`;
 /** Publication details shown on each legal page. Update `updated` and `version` whenever the text changes. */
 export const legalMeta = {
   effective: 'October 17, 2026',
-  updated: 'October 24, 2026',
-  version: '1.2',
+  updated: 'November 17, 2026',
+  version: '1.3',
   /** Website SMS enrollment is not offered; the SMS terms apply only to a separate opt-in. */
   smsEnrollmentEnabled: false,
 } as const;
@@ -79,6 +79,7 @@ const privacy: LegalDocument = {
       bullets: [
         'Consultation details you enter: full name, work email, company, the services you are interested in, optional project notes, and the consultation time you choose.',
         'Technical information that our hosting and security providers process to operate the website, such as IP address, browser and device type, request times, and security events.',
+        'Only if you accept analytics cookies: how you use the website, such as pages viewed, scrolling, clicks on outbound links, file downloads, and site searches, with device, browser, and approximate location information, collected by Google Analytics.',
         'Scheduling information that Calendly, our scheduling provider, collects through its booking form when you choose a time, as described in Calendly’s own privacy notice.',
         'Only if you separately opt in to text messages: your mobile number, the consent you gave and when, messages exchanged, delivery information, and opt-out requests.',
       ],
@@ -93,6 +94,7 @@ const privacy: LegalDocument = {
         'To respond to your inquiry, scope the services you ask about, arrange your consultation, and send the appointment confirmation.',
         'To send the specific service-related text messages you separately agree to receive.',
         'To keep the website secure, prevent abuse and fraud, investigate problems, and comply with legal obligations.',
+        'Only with your consent: to measure how the website is used, including how many visitors book a consultation, so we can improve it.',
         'To honor your communication preferences, including opt-outs.',
       ],
       paragraphs: [
@@ -103,7 +105,7 @@ const privacy: LegalDocument = {
       id: 'legal-bases',
       title: 'Legal bases for processing',
       paragraphs: [
-        'Where data-protection laws such as the GDPR or UK GDPR apply, we process information on these bases: to take steps you request before entering into a contract, such as arranging a consultation; our legitimate interests in responding to business inquiries, securing the website, and preventing abuse; your consent, for any text-message program you join, which you can withdraw at any time; and compliance with legal obligations.',
+        'Where data-protection laws such as the GDPR or UK GDPR apply, we process information on these bases: to take steps you request before entering into a contract, such as arranging a consultation; our legitimate interests in responding to business inquiries, securing the website, and preventing abuse; your consent, for analytics cookies and for any text-message program you join, which you can withdraw at any time; and compliance with legal obligations.',
         'Where we rely on legitimate interests, we balance those interests against your rights, and you may object.',
       ],
     },
@@ -113,10 +115,11 @@ const privacy: LegalDocument = {
       highlight:
         'SMS consent is not shared with third parties or affiliates. All of the categories below exclude text-messaging originator opt-in data and consent; this information will not be shared with any third parties.',
       paragraphs: [
-        'We share other personal information only with service providers that help us operate the website and deliver what you request, such as hosting, scheduling, calendar, and email providers. They may use it only to provide their services to us.',
+        'We share other personal information only with service providers that help us operate the website and deliver what you request, such as hosting, scheduling, calendar, email, and (only with your consent) analytics providers. They may use it only to provide their services to us.',
       ],
       bullets: [
         'When you choose a time, the details you entered (name, email, company, services, and project notes) are passed to Calendly, our scheduling provider, to fill in its booking form. Calendly creates your appointment only when you confirm it, and sends the confirmation and calendar invitation.',
+        'Only if you accept analytics cookies, usage information is processed by Google Analytics, a service provided by Google, so we can see aggregate reports. Advertising features are switched off: the website tells Google not to use this information for advertising or ad personalization.',
         'We may disclose information when required by law, to respond to valid legal process, or to protect the rights, safety, and security of Nuvato AI, our clients, or others.',
         'If Nuvato AI is involved in a merger, acquisition, or sale of assets, information may be transferred as part of that transaction, subject to this policy.',
       ],
@@ -136,10 +139,11 @@ const privacy: LegalDocument = {
       id: 'cookies',
       title: 'Cookies and tracking',
       paragraphs: [
-        'This website does not use advertising cookies, analytics trackers, or cross-site tracking pixels, and it does not store consultation details in your browser’s storage. Form entries stay in page memory until you choose a time or leave the page.',
-        'Our hosting platform may use strictly necessary cookies or similar technology for security and to deliver the site. Because this website itself uses no non-essential tracking, it shows no cookie banner. If that changes, we will update this policy and ask for your consent first.',
+        'This website does not use advertising cookies or cross-site tracking pixels, and it does not store consultation details in your browser’s storage. Form entries stay in page memory until you choose a time or leave the page.',
+        'With your consent, we use Google Analytics cookies (named _ga and _ga_ followed by an identifier, lasting up to 2 years) to measure how the website is used. Nothing from Google loads until you choose Accept in the cookie banner. You can change your choice at any time with Cookie settings at the bottom of every page; if you withdraw consent, the analytics cookies are deleted.',
+        'We remember your choice in your browser’s local storage, which is strictly necessary to respect it. Our hosting platform may also use strictly necessary cookies or similar technology for security and to deliver the site.',
         'The booking scheduler is provided by Calendly and shown in a frame from calendly.com, which loads only when you choose to schedule a consultation. Calendly may set its own cookies within that frame under its own cookie notice, and asks for your consent where required.',
-        'Browser privacy signals such as Global Privacy Control are honored as a request to opt out of the sale or sharing of personal information. Since we do neither, no further action is needed.',
+        'Browser privacy signals such as Global Privacy Control are honored: if your browser sends one, analytics stays off and no banner is shown, unless you choose Accept in Cookie settings. We do not sell or share personal information.',
       ],
     },
     {
@@ -149,6 +153,7 @@ const privacy: LegalDocument = {
         'Inquiry and booking information: 2 years after your last contact with us, then deleted or de-identified.',
         'Client project records: for the duration of the engagement and afterwards as required by the written agreement and by tax, accounting, or other legal obligations.',
         'Text-message consent and opt-out records: for as long as you are enrolled, and up to 4 years after messaging ends, so we can demonstrate consent and continue to honor opt-outs.',
+        'Analytics data: kept in Google Analytics for no longer than 14 months, then deleted.',
         'Hosting and security logs: kept by our providers under their own retention schedules.',
       ],
       paragraphs: [
