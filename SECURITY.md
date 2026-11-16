@@ -20,7 +20,7 @@ The full security model is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#securi
 
 - A strict Content-Security-Policy with a per-request nonce, plus HSTS, frame denial, and a locked-down Permissions-Policy.
 - Booking runs in an embedded Calendly frame. The site holds no credentials and stores no visitor data, and it trusts booking messages only from `https://calendly.com`.
-- No cookies, analytics, or third-party scripts. Visitor details are never stored by this site.
+- The only third-party script is Google Tag Manager (Google Analytics 4). It loads only on production and only after the visitor accepts analytics cookies; the CSP allows Google's analytics domains only when analytics is enabled. Visitor details are never stored by this site.
 - Dependencies are audited in CI, new releases are held for 7 days, and only allowlisted packages may run install scripts.
 
 ## Rules for contributors
@@ -49,6 +49,7 @@ Pull requests that touch these need extra care in review:
 | ------------------------------------- | ------------------------------------------- |
 | CSP and security headers              | `lib/security.ts`, `proxy.ts`, `next.config.ts` |
 | Calendly embed and booking messages   | `lib/calendly.ts`, `components/home/Booking.tsx` |
+| Analytics and consent                 | `lib/analytics.ts`, `lib/consent.ts`, `components/analytics/` |
 | Environment and indexing              | `lib/env.ts`                                |
 | CI and dependency policy              | `.github/`, `pnpm-workspace.yaml`, `package.json` |
 

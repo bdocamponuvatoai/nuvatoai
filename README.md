@@ -18,7 +18,8 @@ The public website for **Nuvato AI**, part of the Isak Global Ventures family. I
 
 - **Server-rendered:** all content is in the initial HTML; only interactive parts hydrate.
 - **Live booking:** a Calendly scheduler inside the site's own booking dialog, pre-filled with the visitor's answers. Nothing is booked until the visitor confirms a time.
-- **Secure by default:** per-request CSP nonce, strict headers, no server-side secrets, and no cookies or third-party scripts on the site itself.
+- **Secure by default:** per-request CSP nonce, strict headers, and no server-side secrets.
+- **Privacy-first analytics:** Google Analytics through Google Tag Manager, loaded only on production and only after a visitor accepts in the consent banner.
 - **Legal pages:** Privacy Policy, Terms & Disclaimer, and SMS Terms.
 
 ## Documentation
@@ -75,7 +76,8 @@ app/                    Routes (App Router)
 components/
   home/                 Homepage sections and their interactive parts
   legal/                Legal page layout
-lib/                    Content, configuration, Calendly, ImageKit, SEO, and security (no React)
+  analytics/            Consent banner and the consent-gated Google tag
+lib/                    Content, configuration, Calendly, ImageKit, analytics, SEO, and security (no React)
 proxy.ts                Per-request CSP nonce
 tests/                  Vitest suites
 docs/                   Architecture and project documentation
@@ -90,10 +92,13 @@ Environment variables are read in `lib/env.ts` and documented in [`.env.example`
 | `SITE_URL`                          | Recommended | Canonical origin for links, the sitemap, and social cards. Defaults to the Vercel production domain. |
 | `SITE_INDEXABLE`                    | At launch   | `true` allows search indexing. Ignored on preview deployments, which are always `noindex`.           |
 | `NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT` | No          | Overrides the ImageKit folder (defaults to `https://ik.imagekit.io/isakglobalventures/nuvato`).      |
+| `ENABLE_ANALYTICS`                  | No          | `true` turns analytics on outside production, for testing. Production deployments always have it on. |
 
 `SITE_URL` and `SITE_INDEXABLE` are read at build time, so redeploy after changing them.
 
 The Calendly event link, meeting name, and duration are in `siteConfig.consultation` (`lib/site-config.ts`). Availability, reminders, and booking questions are managed in the Calendly dashboard.
+
+The Google Tag Manager container ID is in `siteConfig.analytics`. **Before adding any tag to the container,** read [Add or change an analytics tag](CONTRIBUTING.md#add-or-change-an-analytics-tag): tags from new vendors are blocked by the CSP until the code allows them, and may need a Privacy Policy update.
 
 ## Deployment
 
@@ -111,6 +116,8 @@ Hosted on Vercel. `vercel.json` sets the install command (`pnpm install --frozen
 - [ ] Set up the 2-year retention schedule in Calendly and the CRM.
 - [ ] Have the client approve the agent descriptions marked `review: true` in `lib/content.ts`.
 - [ ] SMS registration: once live on `www.nuvato.ai`, confirm `/privacy/` and `/sms-terms/` load, then submit them to RingCentral.
+- [ ] In Google Analytics (Admin → Data collection and Data retention): keep Google signals and ads personalization **off**, and set event data retention to 14 months or less. The Privacy Policy depends on both.
+- [ ] Accept analytics on the live site and confirm visits appear in the GA4 Realtime report; then use Cookie settings to decline and confirm they stop.
 - [ ] Run Lighthouse and the Google Rich Results test on the live URL.
 - [ ] Apply the repository settings in [SECURITY.md](SECURITY.md#repository-settings-checklist), and add uptime monitoring.
 - [ ] Optional: attorney review of the Privacy Policy and Terms.

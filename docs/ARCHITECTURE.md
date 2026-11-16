@@ -4,12 +4,13 @@ How the Nuvato AI site works, and why it is built this way. For setup and comman
 
 ## System overview
 
-A Next.js 16 App Router site on Vercel. It has no database, no API routes, and no secrets of its own. It uses two external services, both loaded directly by the visitor's browser:
+A Next.js 16 App Router site on Vercel. It has no database, no API routes, and no secrets of its own. It uses three external services, all loaded directly by the visitor's browser:
 
 | Service      | Used for                                                         | Configured in                     |
 | ------------ | ---------------------------------------------------------------- | --------------------------------- |
 | **Calendly** | Availability, booking, confirmation emails, calendar invitations | `lib/site-config.ts` (`consultation`) |
 | **ImageKit** | Storing and serving every site image                             | `lib/assets.ts`                   |
+| **Google Tag Manager / Analytics 4** | Usage analytics, only after the visitor consents, on production only | `lib/site-config.ts` (`analytics`) |
 
 ```mermaid
 flowchart LR
@@ -22,13 +23,15 @@ flowchart LR
 
   calendly[(Calendly<br/>scheduling)]
   imagekit[(ImageKit<br/>images)]
+  google[(Google Tag Manager<br/>+ Analytics 4)]
 
   browser --> proxy --> pages
   browser -- iframe in booking dialog --> calendly
   browser -- img --> imagekit
+  browser -. only after consent .-> google
 ```
 
-Because the site holds no credentials and stores no visitor data, there is nothing on the server for an attacker to extract. The Calendly account and ImageKit library are managed in their own dashboards.
+Because the site holds no credentials and stores no visitor data, there is nothing on the server for an attacker to extract. The Calendly account, ImageKit library, and Tag Manager container are managed in their own dashboards.
 
 ## Request lifecycle
 
@@ -97,19 +100,47 @@ How it fits together (`components/home/Booking.tsx`, `lib/calendly.ts`):
 
 The event link, name, and duration live in `siteConfig.consultation` (`lib/site-config.ts`). Calendly settings (availability, buffers, reminders, questions) are managed in the Calendly dashboard. **Never add a phone-number question or text reminders**: the site promises that booking doesn't collect a phone number or enroll anyone in SMS, and the SMS carrier registration relies on that.
 
+## Analytics and consent
+
+Google Analytics 4 runs through the Google Tag Manager container in `siteConfig.analytics` (`components/analytics/`, `lib/consent.ts`, `lib/analytics.ts`).
+
+```mermaid
+flowchart TD
+  visit([Page load]) --> enabled{Production, or<br/>ENABLE_ANALYTICS=true?}
+  enabled -- no --> none[No banner, no Google sources in the CSP]
+  enabled -- yes --> choice{Stored choice?}
+  choice -- none, and no GPC --> banner[Consent banner<br/>Decline / Accept]
+  choice -- none, GPC on --> off[Analytics off]
+  choice -- declined --> off
+  choice -- accepted --> tag[Load the Google tag]
+  banner -- Accept --> tag
+  banner -- Decline --> off
+  tag --> ga[(GA4: page views,<br/>enhanced measurement,<br/>generate_lead on booking)]
+```
+
+- **Nothing loads before consent.** `Analytics` renders the Google tag only once the visitor accepts (or accepted before), so no request reaches Google, and no cookie is set, without a "yes". This matches the Privacy Policy's promise to ask first.
+- **Consent Mode v2.** The bootstrap script sets every signal to denied, then grants `analytics_storage` only. `ad_storage`, `ad_user_data`, and `ad_personalization` stay denied: the container holds no advertising tags.
+- **Global Privacy Control** counts as declining, with no banner, unless the visitor accepts in Cookie settings.
+- **Withdrawing is as easy as consenting.** "Cookie settings" in every footer reopens the banner. Declining after accepting updates consent, deletes the `_ga` cookies, and reloads the page without the tag.
+- **The choice** is stored in `localStorage` (`CONSENT_STORAGE_KEY`), which is strictly necessary to remember it. Bump the key's version to ask everyone again after a material policy change.
+- **Production only.** `siteEnv.analyticsEnabled` is true on Vercel production deployments (or with `ENABLE_ANALYTICS=true`), so previews and local development send nothing. When it's false, there is no banner, no "Cookie settings" link, and no Google source in the CSP.
+- **CSP.** Both Google tag scripts carry the request nonce (`proxy.ts` passes it to `app/layout.tsx` as `x-nonce`). With analytics enabled, the CSP adds exactly the sources Google documents for GA4. Tags from other vendors in the container are blocked until the code allows them; see [CONTRIBUTING](../CONTRIBUTING.md#add-or-change-an-analytics-tag).
+- **Conversions.** A confirmed Calendly booking sends GA4's recommended `generate_lead` event, with no personal data.
+
 ## Security model
 
 | Layer                 | Where                         | What it does                                                                      |
 | --------------------- | ----------------------------- | --------------------------------------------------------------------------------- |
-| Content-Security-Policy | `proxy.ts`, `lib/security.ts` | Scripts only from the site and the request nonce; images only from the site and the ImageKit folder; frames only from Calendly; no plugins, foreign form targets, or framing of this site |
+| Content-Security-Policy | `proxy.ts`, `lib/security.ts` | Scripts only from the site, the request nonce, and (with analytics enabled) Google Tag Manager; images only from the site, the ImageKit folder, and Google Analytics; frames only from Calendly; no plugins, foreign form targets, or framing of this site |
 | Static headers        | `next.config.ts`              | HSTS, `nosniff`, `X-Frame-Options: DENY`, COOP, Referrer-Policy, Permissions-Policy |
 | Indexing control      | `lib/env.ts`                  | `noindex` everywhere until `SITE_INDEXABLE=true`, and always on preview deployments |
 | Booking messages      | `lib/calendly.ts`             | Only messages from `https://calendly.com` are trusted                             |
+| Analytics consent     | `components/analytics/`       | No Google request or cookie before consent; GPC honored; production only          |
 | Supply chain          | `pnpm-workspace.yaml`, CI     | 7-day minimum release age, install scripts allowlisted, `pnpm audit` in CI, actions pinned to commits |
 
-`style-src` allows `'unsafe-inline'` because the hero animation delays and the navigation highlight use inline style attributes, which nonces cannot cover. `script-src` never allows inline or third-party scripts.
+`style-src` allows `'unsafe-inline'` because the hero animation delays and the navigation highlight use inline style attributes, which nonces cannot cover. `script-src` never allows inline scripts without the nonce, `eval` in production, or third-party scripts other than Google Tag Manager.
 
-The site itself sets no cookies and loads no analytics or third-party scripts. Calendly's scheduler, which loads only when a visitor opens the booking dialog, sets its own cookies inside its frame and shows its own consent banner where required (it is deliberately not hidden). Adding any other third-party service requires a CSP change, a Privacy Policy update, and possibly a consent banner. See [SECURITY.md](../SECURITY.md).
+Apart from Google Analytics cookies after consent, the site sets no cookies and loads no other third-party scripts. Calendly's scheduler, which loads only when a visitor opens the booking dialog, sets its own cookies inside its frame and shows its own consent banner where required (it is deliberately not hidden). Adding any other third-party service requires a CSP change, a Privacy Policy update, and possibly a consent banner. See [SECURITY.md](../SECURITY.md).
 
 ## Images
 
@@ -134,6 +165,7 @@ Hand-written CSS with design tokens, no CSS framework. All files in `app/styles/
 | `navigation.css` | Header, services menu, and mobile drawer                                      |
 | `directory.css`  | Agent directory                                                               |
 | `booking.css`    | Booking dialog: navy brand panel beside the Calendly scheduler, stacking on narrow screens |
+| `consent.css`    | Analytics consent banner and the "Cookie settings" footer links                   |
 | `polish.css`     | Final refinements that override earlier files; must stay last                 |
 
 Conventions used across components:
@@ -179,6 +211,7 @@ Structured data is generated from the same content the page shows, so it can't d
 | `seo.test.ts`          | Metadata, structured data, robots, sitemap, environment handling              |
 | `security.test.ts`     | CSP directives and security headers                                          |
 | `calendly.test.ts`     | Embed URL (pre-fill, appearance, cookie banner kept), trusted-origin message handling, frame-src |
+| `analytics.test.ts`    | Container ID, production-only switch, CSP with analytics on and off, consent store (GPC, broken storage), cookie cleanup, Privacy Policy wording |
 | `assets.test.ts`       | Image URLs; with `pnpm test:assets`, that every image exists in ImageKit      |
 
 Tests never call Calendly or create bookings. Components are rendered with `react-dom/server`, so tests check the same HTML search engines receive.

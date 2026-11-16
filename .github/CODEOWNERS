@@ -7,6 +7,9 @@
 # Security-sensitive areas (see SECURITY.md).
 /lib/security.ts    @bdocamponuvatoai
 /lib/calendly.ts    @bdocamponuvatoai
+/lib/analytics.ts   @bdocamponuvatoai
+/lib/consent.ts     @bdocamponuvatoai
+/components/analytics/  @bdocamponuvatoai
 /lib/env.ts         @bdocamponuvatoai
 /proxy.ts           @bdocamponuvatoai
 /next.config.ts     @bdocamponuvatoai

@@ -113,6 +113,18 @@ Bookings are handled by Calendly (see [ARCHITECTURE.md](docs/ARCHITECTURE.md#boo
 3. Add it in Vercel (Project Settings → Environment Variables). Use type **Secret** for credentials and **Config** for everything else.
 4. Only use the `NEXT_PUBLIC_` prefix for values that are safe for anyone to see. They are embedded in browser JavaScript.
 
+### Add or change an analytics tag
+
+Google Tag Manager lets anyone with container access publish tags without a code change, so the code enforces the limits:
+
+- **Google Analytics 4 tags and events** work as they are: the CSP already allows Google's analytics domains.
+- **Any other vendor** (Meta, LinkedIn, Hotjar, Google Ads, and so on) is blocked by the CSP. Adding one needs a pull request that allows its domains in `lib/security.ts`, updates the Privacy Policy, and confirms the consent banner covers it. Advertising tags also need their Consent Mode signals reviewed in `components/analytics/GoogleTag.tsx`.
+- **Custom HTML tags** cannot run under the CSP. Prefer built-in tag types.
+- **Never send personal data** (names, emails, notes) to analytics. Use `trackEvent()` from `lib/analytics.ts` with GA4 recommended event names, like `generate_lead` for a confirmed booking.
+- If the Privacy Policy's analytics terms change materially, bump `CONSENT_STORAGE_KEY` in `lib/consent.ts` so every visitor is asked again.
+
+To test locally, run `ENABLE_ANALYTICS=true pnpm dev`. Previews and local development don't load analytics otherwise.
+
 ### Add a third-party service or script
 
 This affects security and privacy, so plan it in the pull request description:
