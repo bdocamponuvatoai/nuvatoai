@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { images } from '@/lib/assets';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
+import CookieSettingsButton from '@/components/analytics/CookieSettingsButton';
 import BrandLogo from '@/components/BrandLogo';
 import { siteConfig } from '@/lib/site-config';
 
@@ -42,6 +43,7 @@ export default function SiteFooter() {
               <Link href="/privacy/">Privacy</Link>
               <Link href="/terms/">Terms & disclaimer</Link>
               <Link href="/sms-terms/">SMS terms</Link>
+              <CookieSettingsButton />
               <a href={siteConfig.loginUrl}>
                 Log in
                 <ArrowUpRight size={12} />
