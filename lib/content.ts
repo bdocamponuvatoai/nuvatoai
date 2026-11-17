@@ -172,6 +172,23 @@ export const consultationSteps = [
   'Fixed price before work starts',
 ];
 
+/** The invitation to book, on the homepage contact section and at the end of blog pages. */
+export const consultationInvite = {
+  eyebrow: 'BOOK A CONSULTATION',
+  /** Two lines on the homepage; the emphasized word follows the last one. */
+  heading: ['Tell us what needs', 'to work'],
+  emphasis: 'better.',
+  intro: 'Start with the bottleneck, the idea, or the thing your team keeps working around.',
+};
+
+/** Homepage sections in the main navigation, after Services. */
+export const navigationDestinations = [
+  { id: 'agents', label: 'AI agents', description: 'Explore the agent catalog' },
+  { id: 'process', label: 'How we work', description: 'From first scope to ongoing care' },
+  { id: 'why', label: 'Why Nuvato', description: 'One partner for the whole system' },
+  { id: 'security', label: 'Security', description: 'Permissions, reviews, and run logs' },
+];
+
 export const processSteps = [
   {
     title: 'Discover & scope',

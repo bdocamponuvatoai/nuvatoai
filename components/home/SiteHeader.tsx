@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowRight, ArrowUpRight, ChevronDown } from 'lucide-react';
 import BrandLogo from '@/components/BrandLogo';
-import { services } from '@/lib/content';
+import { navigationDestinations as destinations, services } from '@/lib/content';
 import { siteConfig } from '@/lib/site-config';
 import { useHomeState } from './HomeState';
 import { serviceIcons } from './service-icons';
@@ -14,12 +14,6 @@ const serviceSummaries = [
   'Connect tools and remove handoffs.',
   'Make the way you work repeatable.',
   'Internal systems built around you.',
-];
-const destinations = [
-  { id: 'agents', label: 'AI agents', description: 'Explore the agent catalog' },
-  { id: 'process', label: 'How we work', description: 'From first scope to ongoing care' },
-  { id: 'why', label: 'Why Nuvato', description: 'One partner for the whole system' },
-  { id: 'security', label: 'Security', description: 'Permissions, reviews, and run logs' },
 ];
 const sectionIds = ['top', 'services', 'why', 'agents', 'process', 'security', 'faq', 'contact'];
 const primaryIds = ['services', ...destinations.map((item) => item.id)];
