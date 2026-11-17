@@ -48,7 +48,7 @@ The homepage is composed in `components/home/HomePage.tsx`. Everything is a **se
 
 | Server components (no JavaScript sent)                                                       | Client components (`'use client'`)                                                                 |
 | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `Hero`, `CommandCenter`, `ProblemsSection`, `WhySection`, `ProcessSection`, `StatsBand`, `SecuritySection`, `FaqSection`, `ContactSection`, `SiteFooter`, `LegalPage` | `SiteHeader`, `ServicesSection` (tabs), `AgentsSection`, `AgentDirectory` (search), `Inquiry` (form), `Booking` (dialog), `ScrollEffects`, `Counter`, `SpotlightCard`, `ServiceLink` |
+| `Hero`, `CommandCenter`, `ProblemsSection`, `WhySection`, `ProcessSection`, `StatsBand`, `SecuritySection`, `FaqSection`, `ContactSection`, `SiteFooter`, `LegalPage`, `BlogIndex`, `BlogArticle` (and the post's MDX), `BlogCta` | `SiteHeader`, `ServicesSection` (tabs), `AgentsSection`, `AgentDirectory` (search), `Inquiry` (form), `Booking` (dialog), `ScrollEffects`, `Counter`, `SpotlightCard`, `ServiceLink`, `BlogHeader`, `BlogToc` (section tracking), `BlogShare` (copy link) |
 
 Sections that are mostly static but need one interactive element keep that element as a tiny client component. For example, `ProblemsSection` is server-rendered and uses `ServiceLink` for its "What we do" links.
 
@@ -149,6 +149,7 @@ ImageKit is the single source of truth for images; the repository has no `public
 - **`lib/assets.ts`** registers every image path (`images.brandMark`, `toolLogo('hubspot')`, …) and builds URLs.
 - **`lib/imagekit-loader.ts`** is the global `next/image` loader. It requests `tr=w-<width>,c-at_max,q-<quality>`: the width each screen needs, never upscaled, as WebP or AVIF when the browser supports it.
 - **Exact originals** (`tr=orig-true`) are used for SVG tool logos, the social card, and the structured-data logo, because ImageKit's automatic conversion would otherwise rasterize SVGs and drop PNG transparency.
+- **Blog header images** (`blog/<file>` in ImageKit) are always served as exact originals, on the page, in `og:image`, and in the JSON-LD. Their files embed the title, alt text, and an IPTC "AI-generated" marker, and ImageKit strips all metadata from resized images. `pnpm test:assets` checks that the served file still carries the marker.
 - **App icons and fonts** stay in `app/` because browsers fetch them from the site's own domain.
 
 `pnpm test:assets` (also run in CI) checks that every registered image exists in ImageKit with the right file type.
@@ -166,6 +167,7 @@ Hand-written CSS with design tokens, no CSS framework. All files in `app/styles/
 | `directory.css`  | Agent directory                                                               |
 | `booking.css`    | Booking dialog: navy brand panel beside the Calendly scheduler, stacking on narrow screens |
 | `consent.css`    | Analytics consent banner and the "Cookie settings" footer links                   |
+| `blog.css`       | Blog index and posts: hero panel, overlapping image card, contents list, numbered sections, closing panel |
 | `polish.css`     | Final refinements that override earlier files; must stay last                 |
 
 Conventions used across components:
@@ -199,8 +201,22 @@ Copy lives in data files, not in components:
 | `lib/legal-content.ts` | Privacy Policy, Terms, SMS Terms, and their dates (`legalMeta`) |
 | `lib/site-config.ts`   | Business identity, legal contact, login URL                    |
 | `lib/seo.ts`           | Page titles, descriptions, and JSON-LD built from the content above |
+| `content/blog/`        | Blog posts: `<slug>.mdx` and `<slug>.schema.json`, exactly as the content team delivered them |
+| `lib/blog.ts`          | The list of published posts, plus their metadata and JSON-LD   |
 
 Structured data is generated from the same content the page shows, so it can't drift. `tests/seo.test.ts` checks that the FAQ schema matches the visible answers.
+
+### Blog
+
+Posts are approved by the content team before they reach the code, so the repository stores them **unchanged**: the MDX file (YAML frontmatter, then the text) and its JSON-LD file. `content/` is excluded from Prettier so formatting never touches them.
+
+- **Rendering.** `@next/mdx` compiles each post at build time. `remark-frontmatter` and `remark-mdx-frontmatter` export the frontmatter, which `lib/blog.ts` validates: a missing field fails the build with the file and field name. Posts render as plain HTML (`mdx-components.tsx`), styled by `.blog-copy`. MDX can run code, so review a post's diff like code.
+- **Routes.** `/blog/` lists the posts and `/blog/<slug>/` shows one. Only slugs in `blogPosts` exist; anything else is a 404.
+- **Design.** Blog pages are built from the homepage's parts, not new ones: the navy hero panel with horizon rings, a white card overlapping its lower edge (like the command center), and the closing consultation panel (`BlogCta`, with copy shared with the homepage through `consultationInvite`). `BlogHeader` is the site navigation for pages other than the homepage: the same glass bar, adaptive tone, reading progress, and mobile drawer, linking back to homepage sections. The footer is the homepage's `SiteFooter` with `hrefBase="/"`.
+- **Reading aids, without touching the words.** The post's first paragraph (its summary) is set apart as "The short answer". Each `##` section gets an id from its words and a CSS-generated "01 / 09" label. "On this page" lists the sections: it is read from the compiled MDX on the server (`headingsOf()`), so it is in the HTML, and `BlogToc` then highlights the section being read. Below 1100px it becomes a collapsible list above the post.
+- **Metadata.** The frontmatter's `seoTitle` and `description` become the title, description, Open Graph, and Twitter tags. The header image is the social image, and `og:type` is `article` with the published and modified dates.
+- **Structured data.** The page embeds the delivered JSON-LD and adds only what the content team can't know: the page address (`url`, `mainEntityOfPage`) and the image address (`image.url`, `image.contentUrl`).
+- **Approved text stays approved.** `tests/blog.test.tsx` checks that each post's word count still matches its frontmatter, that every FAQ entry is a visible heading and answer, and that the JSON-LD matches the visible post.
 
 ## Testing
 
@@ -208,10 +224,11 @@ Structured data is generated from the same content the page shows, so it can't d
 | ---------------------- | ----------------------------------------------------------------------------- |
 | `home.test.tsx`        | Server-rendered HTML: one `<h1>`, unique IDs, working anchors, section order, all content present, only registered images |
 | `legal.test.tsx`       | Every legal page renders, dates and contact present, carrier-required SMS phrases |
+| `blog.test.tsx`        | Every post: one `<h1>`, approved word count, header image (original file, alt, caption, AI note), FAQ visible, JSON-LD and article metadata, sitemap and index |
 | `seo.test.ts`          | Metadata, structured data, robots, sitemap, environment handling              |
 | `security.test.ts`     | CSP directives and security headers                                          |
 | `calendly.test.ts`     | Embed URL (pre-fill, appearance, cookie banner kept), trusted-origin message handling, frame-src |
 | `analytics.test.ts`    | Container ID, production-only switch, CSP with analytics on and off, consent store (GPC, broken storage), cookie cleanup, Privacy Policy wording |
-| `assets.test.ts`       | Image URLs; with `pnpm test:assets`, that every image exists in ImageKit      |
+| `assets.test.ts`       | Image URLs; with `pnpm test:assets`, that every image exists in ImageKit and blog images keep their AI-generated marker |
 
 Tests never call Calendly or create bookings. Components are rendered with `react-dom/server`, so tests check the same HTML search engines receive.

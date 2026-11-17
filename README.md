@@ -68,6 +68,7 @@ app/                    Routes (App Router)
   layout.tsx            Root layout: fonts, metadata, per-request rendering for CSP nonces
   page.tsx              Homepage + JSON-LD
   privacy/ terms/ sms-terms/   Legal pages
+  blog/                 Blog index and posts (/blog/<slug>/)
   robots.ts sitemap.ts manifest.ts   Metadata routes
   favicon.ico icon1.png icon2.png apple-icon.png   App icons
   error.tsx global-error.tsx not-found.tsx
@@ -76,8 +77,11 @@ app/                    Routes (App Router)
 components/
   home/                 Homepage sections and their interactive parts
   legal/                Legal page layout
+  blog/                 Blog index, article layout, and header
   analytics/            Consent banner and the consent-gated Google tag
-lib/                    Content, configuration, Calendly, ImageKit, analytics, SEO, and security (no React)
+content/blog/           Approved blog posts (MDX) and their JSON-LD, stored as delivered
+lib/                    Content, configuration, Calendly, ImageKit, analytics, SEO, blog, and security (no React)
+mdx-components.tsx      MDX element mapping (required by @next/mdx)
 proxy.ts                Per-request CSP nonce
 tests/                  Vitest suites
 docs/                   Architecture and project documentation
