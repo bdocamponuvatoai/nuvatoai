@@ -21,6 +21,9 @@ export const images = {
 /** Tool logos are named after the tool, e.g. `/tools/hubspot.svg`. */
 export const toolLogo = (tool: string) => `/tools/${tool.toLowerCase()}.svg`;
 
+/** Blog images keep the file name from the post's frontmatter, e.g. `./what-is-an-sop.jpg`. */
+export const blogImage = (file: string) => `/blog/${file.replace(/^\.\//, '')}`;
+
 /**
  * URL for the exact uploaded file. `orig-true` opts out of ImageKit's automatic format
  * conversion, which would otherwise rasterize SVGs and drop the transparency of PNGs

@@ -1,12 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { assetUrl, imageKitEndpoint, imageKitUrl, images, toolLogo } from '@/lib/assets';
+import { blogPosts } from '@/lib/blog';
 import { toolNames } from '@/lib/content';
 import { contentSecurityPolicy } from '@/lib/security';
 
 const ENDPOINT = 'https://ik.imagekit.io/isakglobalventures/nuvato';
 
 /** Every asset the site expects to find in ImageKit. */
-const registeredPaths = [...Object.values(images), ...toolNames.map(toolLogo)];
+const registeredPaths = [
+  ...Object.values(images),
+  ...toolNames.map(toolLogo),
+  ...blogPosts.map((post) => post.image.path),
+];
+
+/** Blog images whose files declare how they were made (for example, AI-generated). */
+const markedBlogImages = blogPosts.filter((post) => post.image.digitalSourceType);
 
 describe('ImageKit asset URLs', () => {
   it('defaults to the Nuvato folder in the Isak Global Ventures account', () => {
@@ -43,6 +51,7 @@ describe.runIf(import.meta.env.MODE === 'remote-assets')('ImageKit library', net
     '.png': 'image/png',
     '.webp': 'image/webp',
     '.svg': 'image/svg+xml',
+    '.jpg': 'image/jpeg',
   };
 
   it.each(registeredPaths)('has %s', async (path) => {
@@ -52,4 +61,14 @@ describe.runIf(import.meta.env.MODE === 'remote-assets')('ImageKit library', net
       contentTypes[path.slice(path.lastIndexOf('.'))],
     );
   });
+
+  // The page serves the original file because ImageKit strips metadata from resized images.
+  it.each(markedBlogImages)(
+    'serves $image.path with its embedded AI-generated marker',
+    async ({ image }) => {
+      const response = await fetch(image.url);
+      const bytes = Buffer.from(await response.arrayBuffer()).toString('latin1');
+      expect(bytes).toContain(image.digitalSourceType);
+    },
+  );
 });

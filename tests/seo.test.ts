@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import robots from '@/app/robots';
 import sitemap from '@/app/sitemap';
+import { blogPosts } from '@/lib/blog';
 import { faqs } from '@/lib/content';
 import { readSiteEnv, siteEnv } from '@/lib/env';
 import { description, pageMetadata, siteOrigin, structuredData } from '@/lib/seo';
@@ -60,9 +61,16 @@ describe('robots and sitemap', () => {
     expect(robots().sitemap).toBe(`${siteOrigin}/sitemap.xml`);
   });
 
-  it('lists the homepage and the three legal pages', () => {
+  it('lists the homepage, the blog, the three legal pages, and every blog post', () => {
     expect(sitemap().map((entry) => entry.url)).toEqual(
-      ['/', '/privacy/', '/terms/', '/sms-terms/'].map((path) => siteOrigin + path),
+      [
+        '/',
+        '/blog/',
+        '/privacy/',
+        '/terms/',
+        '/sms-terms/',
+        ...blogPosts.map((post) => post.path),
+      ].map((path) => siteOrigin + path),
     );
   });
 });

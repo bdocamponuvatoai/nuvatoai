@@ -14,6 +14,7 @@ import './styles/navigation.css';
 import './styles/directory.css';
 import './styles/booking.css';
 import './styles/consent.css';
+import './styles/blog.css';
 import './styles/polish.css';
 
 const inter = localFont({

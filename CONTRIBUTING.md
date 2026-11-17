@@ -77,7 +77,7 @@ Agents with `review: true` show "Description for client review" and are left out
 
 ### Add an image
 
-1. Upload it in the ImageKit dashboard to `nuvato/brand/` or `nuvato/tools/`. Keep the exact file name and turn **off** "Use unique file name".
+1. Upload it in the ImageKit dashboard to `nuvato/brand/` or `nuvato/tools/` (blog images go in `nuvato/blog/`; see below). Keep the exact file name and turn **off** "Use unique file name".
 2. Register its path in `images` in `lib/assets.ts`.
 3. Render it with `<Image src={images.yourImage} width={…} height={…} alt="…" />` from `next/image`.
 4. Run `pnpm test:assets` to confirm ImageKit serves it.
@@ -98,6 +98,19 @@ Bookings are handled by Calendly (see [ARCHITECTURE.md](docs/ARCHITECTURE.md#boo
 1. Create `app/<route>/page.tsx` and export `metadata` using `pageMetadata()` from `lib/seo.ts`.
 2. Add the path, with a trailing slash, to `sitePaths` in `lib/seo.ts` so it appears in the sitemap.
 3. Use `next/link` for links to it.
+
+### Publish a blog post
+
+The content team sends a web handoff with an approved MDX file, a JSON-LD file, and a header image. Use all three **as delivered**: don't edit the words, the alt text, the AI disclosure, or the image file.
+
+1. Save the files as `content/blog/<slug>.mdx` and `content/blog/<slug>.schema.json`. The MDX file name must match its `slug`.
+2. Upload the image in the ImageKit dashboard to `nuvato/blog/`, with the file name from the frontmatter's `image` (for example `what-is-an-sop.jpg`) and "Use unique file name" turned **off**. Don't run it through another image tool first: that can strip the embedded metadata the handoff asks you to keep.
+3. Register the post in `blogPosts` in `lib/blog.ts` (one import for each file and one `readPost(...)` line).
+4. Run `pnpm check`, `pnpm test:assets` (confirms the image exists and still carries its AI-generated marker), and `pnpm build`.
+5. On the Vercel preview, view the source: one `<h1>`, the title and description, the image alt, and the JSON-LD. Run the page through Google's [Rich Results Test](https://search.google.com/test/rich-results).
+6. After merging, send the live address back to the content team so they can record the post as published.
+
+The sitemap, the blog index, the metadata, and the structured data all come from the post's files, so no other change is needed. If a test reports a different word count, the text was changed: restore the delivered file.
 
 ### Change legal text
 

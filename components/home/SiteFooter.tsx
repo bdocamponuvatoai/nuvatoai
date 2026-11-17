@@ -15,7 +15,8 @@ const FOOTER_LINKS = [
   { label: 'Contact', href: '#contact' },
 ];
 
-export default function SiteFooter() {
+/** `hrefBase` is `/` on other pages, so the section links lead back to the homepage. */
+export default function SiteFooter({ hrefBase = '' }: { hrefBase?: '' | '/' }) {
   return (
     <>
       <footer className="footer">
@@ -30,11 +31,15 @@ export default function SiteFooter() {
             </div>
             <nav aria-label="Footer navigation">
               {FOOTER_LINKS.map(({ label, href }) => (
-                <a key={href} href={href}>
+                <a key={href} href={hrefBase + href}>
                   {label}
                   <ArrowUpRight size={14} />
                 </a>
               ))}
+              <Link href="/blog/">
+                Blog
+                <ArrowUpRight size={14} />
+              </Link>
             </nav>
           </div>
           <div className="footer-legal">

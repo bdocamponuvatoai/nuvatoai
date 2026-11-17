@@ -1,8 +1,9 @@
 import { Clock3 } from 'lucide-react';
-import { consultationSteps } from '@/lib/content';
+import { consultationInvite, consultationSteps } from '@/lib/content';
 import Inquiry from './Inquiry';
 
 export default function ContactSection() {
+  const { eyebrow, heading, emphasis, intro } = consultationInvite;
   return (
     <section
       id="contact"
@@ -12,13 +13,13 @@ export default function ContactSection() {
     >
       <div className="container contact-grid">
         <div className="contact-copy">
-          <p className="eyebrow">08 / BOOK A CONSULTATION</p>
+          <p className="eyebrow">08 / {eyebrow}</p>
           <h2>
-            Tell us what needs
+            {heading[0]}
             <br />
-            to work <em>better.</em>
+            {heading[1]} <em>{emphasis}</em>
           </h2>
-          <p>Start with the bottleneck, the idea, or the thing your team keeps working around.</p>
+          <p>{intro}</p>
           <ol>
             {consultationSteps.map((step, i) => (
               <li key={step}>
