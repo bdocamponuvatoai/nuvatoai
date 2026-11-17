@@ -1,6 +1,18 @@
 import type { NextConfig } from 'next';
+import createMDX from '@next/mdx';
 import { securityHeaders } from './lib/security';
 import { siteEnv } from './lib/env';
+
+/**
+ * Blog posts are MDX files in content/blog/ (see lib/blog.ts). Their YAML frontmatter is
+ * exported as `frontmatter`. Plugins are named as strings because Turbopack can't receive
+ * functions; tests compile MDX with the same plugins in vitest.config.ts.
+ */
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: ['remark-frontmatter', ['remark-mdx-frontmatter', { name: 'frontmatter' }]],
+  },
+});
 
 const nextConfig: NextConfig = {
   trailingSlash: true,
@@ -42,4 +54,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withMDX(nextConfig);
