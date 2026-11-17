@@ -4,3 +4,5 @@ coverage
 pnpm-lock.yaml
 docs
 *.md
+# Blog posts and their structured data are delivered approved; keep them byte for byte.
+content

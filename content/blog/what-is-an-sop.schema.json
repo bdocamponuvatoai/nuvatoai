@@ -1,0 +1,107 @@
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "BlogPosting",
+   "headline": "What is an SOP, and when does a small business need one?",
+   "description": "What an SOP is, what it is not, and the one sign a 10 to 20 person business needs one. A plain guide from Nuvato AI.",
+   "datePublished": "2026-11-16",
+   "dateModified": "2026-11-16",
+   "author": {
+    "@type": "Organization",
+    "name": "Nuvato AI",
+    "url": "https://nuvato.ai"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Nuvato AI",
+    "url": "https://nuvato.ai"
+   },
+   "inLanguage": "en-US",
+   "wordCount": 1241,
+   "abstract": "An SOP is a standard operating procedure. It is a written description of how one job in your business gets done, step by step, so the result does not depend on who does it.",
+   "keywords": "what is an SOP, standard operating procedure for small business, when a small business needs an SOP, what a good SOP contains, which process to write down first, keeping an SOP up to date",
+   "articleSection": "SOPs",
+   "image": {
+    "@type": "ImageObject",
+    "name": "What is an SOP, and when does a small business need one?",
+    "caption": "A plain guide for owners of ten to twenty person businesses.",
+    "description": "AI-generated photo of tidy stockroom shelving with plain boxes in low light, behind the post's headline",
+    "width": 1600,
+    "height": 900,
+    "encodingFormat": "image/jpeg",
+    "creditText": "Nuvato AI",
+    "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/compositeWithTrainedAlgorithmicMedia"
+   }
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What is an SOP?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "An SOP covers one job. How an invoice gets sent. How a new customer is set up. How a service call is closed out. How a quote is checked before it leaves the building."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is an SOP not?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It is not a policy manual. A policy says what the business believes. An SOP says what to do on Tuesday."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How do you know a small business needs an SOP?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "There is one sign that matters most. Someone is holding the process in their head."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What does a good SOP contain?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A good SOP is short enough to be read while doing the job. It has the same parts every time, so people know where to look."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Which process should you write down first?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Pick the one that has all three of these traits. It repeats. It causes mistakes or delays when it goes wrong. And it depends on one person."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How do you keep an SOP from going stale?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Give it an owner and a review date. Those two things do the work."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What happens once a process is written down?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Two things become possible."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How does Nuvato AI's SOPs and process improvement service work?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Nuvato AI builds the systems small businesses run on. SOPs and process improvement is one of five services it offers today, alongside website creation, AI agents, automations and enterprise platforms. It serves businesses in the US, Canada and Argentina."
+     }
+    }
+   ]
+  }
+ ]
+}

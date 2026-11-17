@@ -36,6 +36,10 @@ export default function SiteFooter({ hrefBase = '' }: { hrefBase?: '' | '/' }) {
                   <ArrowUpRight size={14} />
                 </a>
               ))}
+              <Link href="/blog/">
+                Blog
+                <ArrowUpRight size={14} />
+              </Link>
             </nav>
           </div>
           <div className="footer-legal">

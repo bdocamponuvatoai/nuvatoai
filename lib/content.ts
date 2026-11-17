@@ -189,6 +189,13 @@ export const navigationDestinations = [
   { id: 'security', label: 'Security', description: 'Permissions, reviews, and run logs' },
 ];
 
+/** The blog, as it appears in the main navigation. */
+export const blogNavigation = {
+  href: '/blog/',
+  label: 'Blog',
+  description: 'Plain guides from Nuvato AI',
+};
+
 export const processSteps = [
   {
     title: 'Discover & scope',

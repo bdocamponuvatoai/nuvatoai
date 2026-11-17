@@ -16,8 +16,11 @@ export const socialImage = {
   alt: 'Nuvato AI — Websites, AI agents, automation, documentation, and enterprise platforms',
 };
 
-/** Pages listed in the sitemap, with trailing slashes to match `trailingSlash: true`. */
-export const sitePaths = ['/', '/privacy/', '/terms/', '/sms-terms/'] as const;
+/**
+ * Pages listed in the sitemap, with trailing slashes to match `trailingSlash: true`.
+ * Blog posts are added from `blogPosts` (lib/blog.ts).
+ */
+export const sitePaths = ['/', '/blog/', '/privacy/', '/terms/', '/sms-terms/'] as const;
 
 export function pageMetadata(path: string, pageTitle: string, pageDescription: string): Metadata {
   return {
