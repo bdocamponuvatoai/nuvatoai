@@ -11,8 +11,8 @@ const link = (url: string) => `[${url}](${url})`;
 /** Publication details shown on each legal page. Update `updated` and `version` whenever the text changes. */
 export const legalMeta = {
   effective: 'October 17, 2026',
-  updated: 'November 17, 2026',
-  version: '1.3',
+  updated: 'November 19, 2026',
+  version: '1.4',
   /** Website SMS enrollment is not offered; the SMS terms apply only to a separate opt-in. */
   smsEnrollmentEnabled: false,
 } as const;
@@ -482,8 +482,7 @@ const smsTerms: LegalDocument = {
     {
       id: 'help',
       title: 'How to get help',
-      highlight:
-        'For assistance, text HELP or visit our website at [nuvato.ai](https://www.nuvato.ai/).',
+      highlight: `For assistance, text HELP or visit our website at [nuvato.ai](${business.publicUrl}/).`,
       paragraphs: [`You can also email ${email}.`],
     },
     {

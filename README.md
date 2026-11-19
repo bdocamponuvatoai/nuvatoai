@@ -93,8 +93,8 @@ Environment variables are read in `lib/env.ts` and documented in [`.env.example`
 
 | Variable                            | Required    | Purpose                                                                                              |
 | ----------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------- |
-| `SITE_URL`                          | Recommended | Canonical origin for links, the sitemap, and social cards. Defaults to the Vercel production domain. |
-| `SITE_INDEXABLE`                    | At launch   | `true` allows search indexing. Ignored on preview deployments, which are always `noindex`.           |
+| `SITE_URL`                          | No          | Canonical origin for links, the sitemap, and social cards. Defaults to `https://nuvato.ai` on Vercel. |
+| `SITE_INDEXABLE`                    | No          | `false` closes production to search engines. Previews are always `noindex`.                          |
 | `NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT` | No          | Overrides the ImageKit folder (defaults to `https://ik.imagekit.io/isakglobalventures/nuvato`).      |
 | `ENABLE_ANALYTICS`                  | No          | `true` turns analytics on outside production, for testing. Production deployments always have it on. |
 
@@ -110,16 +110,24 @@ Hosted on Vercel. `vercel.json` sets the install command (`pnpm install --frozen
 
 - **Pull requests** get a preview deployment, which search engines never index.
 - **Merging to `main`** deploys to production.
+- **Only `nuvato.ai` is indexed.** Production allows every crawler, AI crawlers included, and every other host (such as the deployment's own `*.vercel.app` address) sends `X-Robots-Tag: noindex`. Canonical links, Open Graph, structured data, and the sitemap always name `https://nuvato.ai`.
+
+After a production deploy, both of these should confirm it is open to search:
+
+```sh
+curl -sI https://nuvato.ai/blog/what-is-an-sop/ | grep -i x-robots-tag   # prints nothing
+curl -s https://nuvato.ai/robots.txt   # Allow: /, and Sitemap: https://nuvato.ai/sitemap.xml
+```
 
 ## Launch checklist
 
 - [ ] Place one test booking through the site, confirm the "You're booked" screen, the confirmation email, and the calendar invite, then cancel it in Calendly.
 - [ ] In Calendly, confirm the Discovery call's questions are, in order, Company, Services of interest, and Project details, with no phone number or text reminders.
-- [ ] Set `SITE_URL=https://www.nuvato.ai` and `SITE_INDEXABLE=true` for Production, redeploy, and confirm `/robots.txt` allows crawling.
+- [ ] Add `nuvato.ai` to Google Search Console and Bing Webmaster Tools, submit `https://nuvato.ai/sitemap.xml` in both, and request indexing for `/blog/` and each post.
 - [ ] Confirm someone monitors `legal@nuvato.ai`. Privacy requests have legal deadlines.
 - [ ] Set up the 2-year retention schedule in Calendly and the CRM.
 - [ ] Have the client approve the agent descriptions marked `review: true` in `lib/content.ts`.
-- [ ] SMS registration: once live on `www.nuvato.ai`, confirm `/privacy/` and `/sms-terms/` load, then submit them to RingCentral.
+- [ ] SMS registration: once live on `nuvato.ai`, confirm `/privacy/` and `/sms-terms/` load, then submit them to RingCentral.
 - [ ] In Google Analytics (Admin → Data collection and Data retention): keep Google signals and ads personalization **off**, and set event data retention to 14 months or less. The Privacy Policy depends on both.
 - [ ] Accept analytics on the live site and confirm visits appear in the GA4 Realtime report; then use Cookie settings to decline and confirm they stop.
 - [ ] Run Lighthouse and the Google Rich Results test on the live URL.

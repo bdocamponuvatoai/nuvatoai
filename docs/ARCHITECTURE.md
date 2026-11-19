@@ -133,7 +133,7 @@ flowchart TD
 | --------------------- | ----------------------------- | --------------------------------------------------------------------------------- |
 | Content-Security-Policy | `proxy.ts`, `lib/security.ts` | Scripts only from the site, the request nonce, and (with analytics enabled) Google Tag Manager; images only from the site, the ImageKit folder, and Google Analytics; frames only from Calendly; no plugins, foreign form targets, or framing of this site |
 | Static headers        | `next.config.ts`              | HSTS, `nosniff`, `X-Frame-Options: DENY`, COOP, Referrer-Policy, Permissions-Policy |
-| Indexing control      | `lib/env.ts`                  | `noindex` everywhere until `SITE_INDEXABLE=true`, and always on preview deployments |
+| Indexing control      | `lib/env.ts`                  | Production is indexable on `nuvato.ai` only (`SITE_INDEXABLE=false` closes it); other hosts, such as `*.vercel.app`, and every preview deployment send `noindex` |
 | Booking messages      | `lib/calendly.ts`             | Only messages from `https://calendly.com` are trusted                             |
 | Analytics consent     | `components/analytics/`       | No Google request or cookie before consent; GPC honored; production only          |
 | Supply chain          | `pnpm-workspace.yaml`, CI     | 7-day minimum release age, install scripts allowlisted, `pnpm audit` in CI, actions pinned to commits |
