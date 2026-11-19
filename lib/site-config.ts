@@ -1,6 +1,6 @@
 /**
  * Fixed business facts shared by pages, legal copy, and structured data.
- * Deployment-specific settings (canonical URL, indexing) live in `lib/env.ts`.
+ * Deployment-specific settings (indexing, a SITE_URL override) live in `lib/env.ts`.
  */
 export const siteConfig = {
   /** Existing client portal. */
@@ -30,7 +30,11 @@ export const siteConfig = {
     countryCode: 'US',
     /** Published contact for legal, privacy, accessibility, and SMS help requests. Must be a monitored mailbox. */
     legalEmail: 'legal@nuvato.ai',
-    /** Public website named in the SMS terms and carrier registration. No trailing slash. */
-    publicUrl: 'https://www.nuvato.ai',
+    /**
+     * The public website, with no trailing slash: the canonical address of every Vercel
+     * deployment (see lib/env.ts), and the site named in the SMS terms and carrier
+     * registration. www.nuvato.ai redirects here.
+     */
+    publicUrl: 'https://nuvato.ai',
   },
 } as const;

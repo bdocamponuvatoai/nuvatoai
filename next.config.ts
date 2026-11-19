@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 import createMDX from '@next/mdx';
 import { securityHeaders } from './lib/security';
-import { siteEnv } from './lib/env';
+import { robotsHeaders, siteEnv } from './lib/env';
 
 /**
  * Blog posts are MDX files in content/blog/ (see lib/blog.ts). Their YAML frontmatter is
@@ -32,16 +32,14 @@ const nextConfig: NextConfig = {
   },
 
   async headers() {
-    const robotsHeader = siteEnv.indexable
-      ? []
-      : [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }];
-
     return [
       {
         // The Content-Security-Policy needs a per-request nonce, so proxy.ts sets it.
         source: '/:path*',
-        headers: [...securityHeaders, ...robotsHeader],
+        headers: securityHeaders,
       },
+      // noindex on previews, and on every host but nuvato.ai in production.
+      ...robotsHeaders(siteEnv),
     ];
   },
 
