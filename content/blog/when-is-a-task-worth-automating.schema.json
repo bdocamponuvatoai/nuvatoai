@@ -1,0 +1,70 @@
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "BlogPosting",
+   "headline": "When is a task worth automating in a small business?",
+   "description": "A task is worth automating when it repeats, follows the same steps each time and hurts when missed. How to tell, and when to write it down first.",
+   "datePublished": "2026-11-24",
+   "dateModified": "2026-11-24",
+   "author": {
+    "@type": "Organization",
+    "name": "Nuvato AI",
+    "url": "https://nuvato.ai"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Nuvato AI",
+    "url": "https://nuvato.ai"
+   },
+   "inLanguage": "en-US",
+   "wordCount": 1184,
+   "abstract": "A task is worth automating when it repeats often, follows the same steps each time, and causes real trouble when it is late or done wrong. If the steps change every time, or the task needs a judgment call at each turn, fix the process first, because automating a messy process makes the mess happen faster.",
+   "keywords": "how to know if a task is worth automating, what tasks to automate in a small business, when not to automate a process, write an SOP before automating, is automation worth it for a small business",
+   "articleSection": "Automation",
+   "mainEntityOfPage": "https://nuvato.ai/blog/when-is-a-task-worth-automating",
+   "url": "https://nuvato.ai/blog/when-is-a-task-worth-automating",
+   "image": {
+    "@type": "ImageObject",
+    "name": "When is a task worth automating in a small business?",
+    "caption": "Four questions to ask before you build anything, for owners of ten to twenty person businesses.",
+    "description": "Licensed stock photo of a laptop on a desk by tall windows, headline: When is a task worth automating in a small business?",
+    "width": 1600,
+    "height": 900,
+    "encodingFormat": "image/jpeg",
+    "creditText": "Nuvato AI",
+    "contentUrl": "https://nuvato.ai/blog/when-is-a-task-worth-automating.jpg"
+   }
+  },
+  {
+   "@type": "FAQPage",
+   "url": "https://nuvato.ai/blog/when-is-a-task-worth-automating",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much time does a task need to take before automating it pays off?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "There is no single number. Weigh how often the task happens, how long it takes each time and what a mistake costs, against what the automation costs to build and look after. A quick task that repeats many times a day, or one where errors reach customers, can be worth it before a long but rare one."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What makes a task a bad fit for automation?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A task is a poor fit when its steps change every time, when it happens rarely, when your team does not agree on how it should be done, or when a mistake would be hard to undo. If the real problem is that nobody owns the work, an automation will not fix it."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Should you write the process down before you automate it?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. A one-page SOP, written by the person who does the task, shows whether the steps are really the same each time and where the decisions sit. It often fixes the problem on its own, and when it does not, it becomes the brief for the automation."
+     }
+    }
+   ]
+  }
+ ]
+}

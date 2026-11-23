@@ -419,6 +419,11 @@
 .blog-copy li + li {
   margin-top: 8px;
 }
+.blog-copy ol > li::marker {
+  color: var(--blue);
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
 .blog-copy strong {
   color: var(--navy);
 }
@@ -436,6 +441,55 @@
   margin: 32px 0;
   padding: 4px 0 4px 22px;
   border-left: 2px solid var(--blue);
+}
+
+/* Tables: a comparison card in the style of "The short answer", columns side by side */
+.blog-table {
+  margin-top: 28px;
+  overflow: hidden;
+  border: 1px solid #cad7ed;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fff, #f8faff);
+  box-shadow: 0 24px 48px -32px #0a123040;
+}
+.blog-table table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.blog-table th,
+.blog-table td {
+  padding: 16px 22px;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.blog-table th {
+  padding-block: 14px;
+  background: var(--ice);
+  color: var(--blue);
+  font: 400 11px/1.6 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.blog-table td {
+  border-top: 1px solid var(--line);
+  color: var(--navy);
+  font-size: 15.5px;
+  line-height: 1.55;
+}
+.blog-table th + th,
+.blog-table td + td {
+  border-left: 1px solid var(--line);
+}
+@media (max-width: 599px) {
+  .blog-table th,
+  .blog-table td {
+    padding-inline: 14px;
+  }
+  .blog-table td {
+    font-size: 15px;
+  }
 }
 
 /* Author and sharing */

@@ -6,6 +6,10 @@ import WebsiteCost, {
   frontmatter as websiteCost,
 } from '@/content/blog/what-small-business-website-cost.mdx';
 import websiteCostSchema from '@/content/blog/what-small-business-website-cost.schema.json';
+import TaskAutomation, {
+  frontmatter as taskAutomation,
+} from '@/content/blog/when-is-a-task-worth-automating.mdx';
+import taskAutomationSchema from '@/content/blog/when-is-a-task-worth-automating.schema.json';
 import { assetUrl, blogImage } from './assets';
 import { siteOrigin } from './seo';
 
@@ -123,6 +127,12 @@ function readPost(file: string, frontmatter: unknown, Content: MDXContent, schem
 export const blogPosts: BlogPost[] = [
   readPost('what-is-an-sop.mdx', whatIsAnSop, WhatIsAnSop, whatIsAnSopSchema),
   readPost('what-small-business-website-cost.mdx', websiteCost, WebsiteCost, websiteCostSchema),
+  readPost(
+    'when-is-a-task-worth-automating.mdx',
+    taskAutomation,
+    TaskAutomation,
+    taskAutomationSchema,
+  ),
 ].sort((a, b) => b.date.localeCompare(a.date));
 
 export const getBlogPost = (slug: string) => blogPosts.find((post) => post.slug === slug);
