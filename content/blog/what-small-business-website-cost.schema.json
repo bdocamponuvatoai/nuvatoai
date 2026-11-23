@@ -1,0 +1,86 @@
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "BlogPosting",
+   "headline": "What does a small business website cost, and what does it cover?",
+   "description": "A monthly website plan and a built system are different purchases. How to tell which one your business needs, and why the price should be fixed first.",
+   "datePublished": "2026-11-18",
+   "dateModified": "2026-11-18",
+   "author": {
+    "@type": "Organization",
+    "name": "Nuvato AI",
+    "url": "https://nuvato.ai"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Nuvato AI",
+    "url": "https://nuvato.ai"
+   },
+   "inLanguage": "en-US",
+   "wordCount": 1139,
+   "abstract": "A small business website can mean two different purchases. One is a monthly plan for a template you fill in and look after yourself. The other is a system built around how your business takes enquiries, and the price for that is set once the job is written down.",
+   "keywords": "small business website cost, website builder plan vs custom website, what a small business website includes, questions to ask a web builder, fixed price website",
+   "articleSection": "Websites",
+   "mainEntityOfPage": "https://nuvato.ai/blog/what-small-business-website-cost",
+   "url": "https://nuvato.ai/blog/what-small-business-website-cost",
+   "image": {
+    "@type": "ImageObject",
+    "name": "What does a small business website cost, and what does it cover?",
+    "caption": "The monthly plan and the built system, for owners of ten to twenty person businesses.",
+    "description": "Licensed stock photo of a laptop on a desk in front of tall industrial windows, behind the post's headline",
+    "width": 1600,
+    "height": 900,
+    "encodingFormat": "image/jpeg",
+    "creditText": "Nuvato AI",
+    "contentUrl": "https://nuvato.ai/blog/what-small-business-website-cost.jpg"
+   }
+  },
+  {
+   "@type": "FAQPage",
+   "url": "https://nuvato.ai/blog/what-small-business-website-cost",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much does a small business website cost?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It depends on which of two purchases you are making. A monthly website builder plan has a published price and covers a template, hosting and the tools to edit the pages. A built system is priced once the job is written down in a scope, so the price reflects what is being built."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the difference between a website builder plan and a built system?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A builder plan pays for a template, hosting and editing tools, and you do the rest yourself. A built system is the website plus what happens after someone uses it: where each enquiry is recorded, who is reminded, and the written procedure for who does what."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does a small business need a custom-built website?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Not always. If someone sees each enquiry the next morning and replies, a monthly plan may be all you need. If enquiries sometimes wait for days or depend on who checks the inbox, the problem is the process behind the website, and a new template will not fix it."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What should you ask a web builder before you pay?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Ask what exactly is included, who looks after it afterwards, where your enquiries are stored and how you get them out if you leave, and when the price is set. Ask to see a real example the team built, shown with the owner's permission."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why should a website price be fixed before work starts?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A fixed price needs a written scope to attach to. When the scope is written first, the owner knows what is included before agreeing, and the team building it knows where the job ends."
+     }
+    }
+   ]
+  }
+ ]
+}

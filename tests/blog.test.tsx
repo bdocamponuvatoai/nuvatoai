@@ -37,6 +37,20 @@ const plain = (markup: string) =>
     .replaceAll('&gt;', '>')
     .replaceAll('&amp;', '&');
 
+/** A JSON-LD document without the page and image addresses, which the site sets. */
+const withoutAddresses = (schema: Node) => {
+  const copy = structuredClone(schema);
+  for (const node of copy['@graph'] as Node[]) {
+    delete node.url;
+    delete node.mainEntityOfPage;
+    if (node.image) {
+      delete node.image.url;
+      delete node.image.contentUrl;
+    }
+  }
+  return copy;
+};
+
 /** Inner HTML of every element with this tag. */
 const contentsOf = (markup: string, tag: string) =>
   [...markup.matchAll(new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)</${tag}>`, 'g'))].map(
@@ -97,7 +111,8 @@ describe.each(blogPosts)('blog post $slug', (post) => {
   });
 
   it('shows every FAQ question as a heading, with its answer', () => {
-    const headings = contentsOf(visible, 'h2').map(plain);
+    // A section of its own (##), or a question in a "Common questions" section (###).
+    const headings = [...contentsOf(visible, 'h2'), ...contentsOf(visible, 'h3')].map(plain);
     for (const { question, answer } of post.faq) {
       expect(headings).toContain(question);
       expect(visible).toContain(escape(answer));
@@ -123,15 +138,17 @@ describe.each(blogPosts)('blog post $slug', (post) => {
     for (const [, id] of html.matchAll(/href="#([^"]+)"/g)) expect(ids).toContain(id);
   });
 
-  it('embeds the delivered JSON-LD, adding only the page and image addresses', () => {
+  it('embeds the delivered JSON-LD, setting only the page and image addresses', () => {
     expect(jsonLd).toEqual(blogPostStructuredData(post));
-    expect(jsonLd).toMatchObject(post.schema);
+    expect(withoutAddresses(jsonLd)).toEqual(withoutAddresses(post.schema));
 
-    const posting = jsonLd['@graph'].find((node: Node) => node['@type'] === 'BlogPosting');
+    const graph = jsonLd['@graph'] as Node[];
+    const posting = graph.find((node) => node['@type'] === 'BlogPosting')!;
     expect(posting.url).toBe(pageUrl);
     expect(posting.mainEntityOfPage).toBe(pageUrl);
     expect(posting.image.contentUrl).toBe(post.image.url);
     expect(posting.image.url).toBe(post.image.url);
+    for (const node of graph) if (node.url) expect([pageUrl, post.image.url]).toContain(node.url);
   });
 
   it('keeps the JSON-LD consistent with the visible post', () => {
@@ -219,6 +236,59 @@ describe('What is an SOP (web handoff, 16 November 2026)', () => {
     expect(post.image.aiDisclosure).toBe(
       'Background image generated with Higgsfield Soul Location on 12 Nov 2026; not a real site, person or client.',
     );
+  });
+});
+
+describe('What a small business website costs (web handoff, 18 November 2026)', () => {
+  const post = getBlogPost('what-small-business-website-cost')!;
+  const html = renderToStaticMarkup(<BlogArticle post={post} />);
+
+  it('uses the approved page values', () => {
+    expect(post.path).toBe('/blog/what-small-business-website-cost/');
+    expect(post.title).toBe('What does a small business website cost, and what does it cover?');
+    expect(post.seoTitle).toBe('What a small business website costs, and what it covers');
+    expect(post.description).toBe(
+      'A monthly website plan and a built system are different purchases. How to tell which one your business needs, and why the price should be fixed first.',
+    );
+    expect([post.date, post.dateModified]).toEqual(['2026-11-18', '2026-11-18']);
+    expect([post.category, post.readingTime, post.wordCount]).toEqual(['Websites', 5, 1139]);
+  });
+
+  it('keeps the approved image alt text, with no AI note', () => {
+    expect(post.image.path).toBe('/blog/what-small-business-website-cost.jpg');
+    expect([post.image.width, post.image.height, post.image.type]).toEqual([
+      1600,
+      900,
+      'image/jpeg',
+    ]);
+    expect(post.image.alt).toBe(
+      "Licensed stock photo of a laptop on a desk in front of tall industrial windows, behind the post's headline",
+    );
+    expect(post.image.aiDisclosure).toBeUndefined();
+    expect(html).not.toContain('AI image');
+  });
+
+  it('finds every section', () => {
+    expect(headingsOf(post.Content).map(({ id }) => id)).toEqual([
+      'what-does-a-monthly-website-plan-pay-for',
+      'what-does-a-built-system-pay-for',
+      'how-do-you-know-which-one-your-business-needs',
+      'what-should-you-ask-before-you-pay-for-either-one',
+      'why-should-the-price-be-fixed-before-work-starts',
+      'how-does-nuvato-ai-price-a-build',
+      'common-questions',
+      'what-to-do-next',
+    ]);
+  });
+
+  it('shows the FAQ as written in "Common questions": the question a heading, its answer below', () => {
+    const block = html
+      .slice(html.indexOf('<h2 id="common-questions">'), html.indexOf('<h2 id="what-to-do-next">'))
+      .replace(/>\s+</g, '><');
+    expect(block).toMatch(/^<h2 id="common-questions">/);
+    for (const { question, answer } of post.faq) {
+      expect(block).toContain(`<h3>${escape(question)}</h3><p>${escape(answer)}</p>`);
+    }
   });
 });
 
