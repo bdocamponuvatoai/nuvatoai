@@ -226,6 +226,7 @@ Posts are approved by the content team before they reach the code, so the reposi
 | `legal.test.tsx`       | Every legal page renders, dates and contact present, carrier-required SMS phrases |
 | `blog.test.tsx`        | Every post: one `<h1>`, approved word count, header image (original file, alt, caption, AI note), FAQ visible, JSON-LD and article metadata, sitemap and index |
 | `seo.test.ts`          | Metadata, structured data, robots, sitemap, environment handling              |
+| `social.test.tsx`      | Footer social links: exact profile addresses, accessible names, hidden icons, and the organization's `sameAs` |
 | `security.test.ts`     | CSP directives and security headers                                          |
 | `calendly.test.ts`     | Embed URL (pre-fill, appearance, cookie banner kept), trusted-origin message handling, frame-src |
 | `analytics.test.ts`    | Container ID, production-only switch, CSP with analytics on and off, consent store (GPC, broken storage), cookie cleanup, Privacy Policy wording |

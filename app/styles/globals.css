@@ -1823,6 +1823,39 @@ button:disabled {
 .footer-top nav a:hover {
   color: var(--blue);
 }
+/* Social profiles: round icon links under the tagline (components/SocialLinks.tsx) */
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.social-links a {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--slate);
+  transition:
+    color 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+.social-links a:hover {
+  border-color: #b9cbec;
+  box-shadow: 0 12px 24px -16px #0a123059;
+  color: var(--blue);
+  transform: translateY(-2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .social-links a:hover {
+    transform: none;
+  }
+}
 .footer-legal {
   border-top: 1px solid var(--line);
   margin-top: 30px;

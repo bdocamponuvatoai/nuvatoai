@@ -61,6 +61,7 @@ export const structuredData = {
       '@id': organizationId,
       name: siteConfig.business.name,
       url: `${siteOrigin}/`,
+      sameAs: siteConfig.social.map(({ url }) => url),
       address: {
         '@type': 'PostalAddress',
         addressLocality: siteConfig.business.locality,

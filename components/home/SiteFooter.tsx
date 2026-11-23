@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import CookieSettingsButton from '@/components/analytics/CookieSettingsButton';
 import BrandLogo from '@/components/BrandLogo';
+import SocialLinks from '@/components/SocialLinks';
 import { siteConfig } from '@/lib/site-config';
 
 const FOOTER_LINKS = [
@@ -28,6 +29,7 @@ export default function SiteFooter({ hrefBase = '' }: { hrefBase?: '' | '/' }) {
                 New technology · Intelligent innovation ·<br />
                 Business transformation.
               </p>
+              <SocialLinks />
             </div>
             <nav aria-label="Footer navigation">
               {FOOTER_LINKS.map(({ label, href }) => (
