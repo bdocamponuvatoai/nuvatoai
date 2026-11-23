@@ -2,13 +2,17 @@ import type { Metadata } from 'next';
 import type { MDXContent } from 'mdx/types';
 import WhatIsAnSop, { frontmatter as whatIsAnSop } from '@/content/blog/what-is-an-sop.mdx';
 import whatIsAnSopSchema from '@/content/blog/what-is-an-sop.schema.json';
+import WebsiteCost, {
+  frontmatter as websiteCost,
+} from '@/content/blog/what-small-business-website-cost.mdx';
+import websiteCostSchema from '@/content/blog/what-small-business-website-cost.schema.json';
 import { assetUrl, blogImage } from './assets';
 import { siteOrigin } from './seo';
 
 /**
  * Blog posts arrive from the content team as an approved MDX file and a JSON-LD file
  * (content/blog/<slug>.mdx and <slug>.schema.json). Both are used exactly as delivered:
- * the page shows the MDX, and the JSON-LD only gains the page and image addresses.
+ * the page shows the MDX, and the site sets only the JSON-LD's page and image addresses.
  */
 
 type JsonLdNode = Record<string, unknown>;
@@ -118,6 +122,7 @@ function readPost(file: string, frontmatter: unknown, Content: MDXContent, schem
 /** Every published post, newest first. Add new posts here. */
 export const blogPosts: BlogPost[] = [
   readPost('what-is-an-sop.mdx', whatIsAnSop, WhatIsAnSop, whatIsAnSopSchema),
+  readPost('what-small-business-website-cost.mdx', websiteCost, WebsiteCost, websiteCostSchema),
 ].sort((a, b) => b.date.localeCompare(a.date));
 
 export const getBlogPost = (slug: string) => blogPosts.find((post) => post.slug === slug);
@@ -188,24 +193,30 @@ export function blogPostMetadata(post: BlogPost): Metadata {
   };
 }
 
-/** The delivered JSON-LD, plus the page address and the image address it can't know. */
+/**
+ * The delivered JSON-LD, with the page's canonical address and the image file it serves.
+ * The site sets these even when a handoff fills them in: handoffs write the page address
+ * without its trailing slash and place the image on nuvato.ai, where it isn't hosted.
+ */
 export function blogPostStructuredData(post: BlogPost): JsonLd {
   const pageUrl = siteOrigin + post.path;
   return {
     ...post.schema,
-    '@graph': post.schema['@graph'].map((node) =>
-      node['@type'] === 'BlogPosting'
-        ? {
-            ...node,
-            url: pageUrl,
-            mainEntityOfPage: pageUrl,
-            image: {
-              ...(isRecord(node.image) ? node.image : {}),
-              url: post.image.url,
-              contentUrl: post.image.url,
-            },
-          }
-        : node,
-    ),
+    '@graph': post.schema['@graph'].map((node) => {
+      if (node['@type'] === 'BlogPosting') {
+        return {
+          ...node,
+          url: pageUrl,
+          mainEntityOfPage: pageUrl,
+          image: {
+            ...(isRecord(node.image) ? node.image : {}),
+            url: post.image.url,
+            contentUrl: post.image.url,
+          },
+        };
+      }
+      if (node['@type'] === 'FAQPage' && node.url) return { ...node, url: pageUrl };
+      return node;
+    }),
   };
 }

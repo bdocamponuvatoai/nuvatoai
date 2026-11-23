@@ -63,6 +63,12 @@ describe.runIf(import.meta.env.MODE === 'remote-assets')('ImageKit library', net
   });
 
   // The page serves the original file because ImageKit strips metadata from resized images.
+  it.each(blogPosts)('serves $image.path with its embedded title', async ({ image }) => {
+    const response = await fetch(image.url);
+    const bytes = Buffer.from(await response.arrayBuffer()).toString('utf8');
+    expect(bytes).toContain(image.title);
+  });
+
   it.each(markedBlogImages)(
     'serves $image.path with its embedded AI-generated marker',
     async ({ image }) => {

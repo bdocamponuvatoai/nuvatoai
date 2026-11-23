@@ -149,7 +149,7 @@ ImageKit is the single source of truth for images; the repository has no `public
 - **`lib/assets.ts`** registers every image path (`images.brandMark`, `toolLogo('hubspot')`, …) and builds URLs.
 - **`lib/imagekit-loader.ts`** is the global `next/image` loader. It requests `tr=w-<width>,c-at_max,q-<quality>`: the width each screen needs, never upscaled, as WebP or AVIF when the browser supports it.
 - **Exact originals** (`tr=orig-true`) are used for SVG tool logos, the social card, and the structured-data logo, because ImageKit's automatic conversion would otherwise rasterize SVGs and drop PNG transparency.
-- **Blog header images** (`blog/<file>` in ImageKit) are always served as exact originals, on the page, in `og:image`, and in the JSON-LD. Their files embed the title, alt text, and an IPTC "AI-generated" marker, and ImageKit strips all metadata from resized images. `pnpm test:assets` checks that the served file still carries the marker.
+- **Blog header images** (`blog/<file>` in ImageKit) are always served as exact originals, on the page, in `og:image`, and in the JSON-LD. Their files embed the title, alt text, and (for AI images) an IPTC "AI-generated" marker, and ImageKit strips all metadata from resized images. `pnpm test:assets` checks that the served file still carries its title and any marker.
 - **App icons and fonts** stay in `app/` because browsers fetch them from the site's own domain.
 
 `pnpm test:assets` (also run in CI) checks that every registered image exists in ImageKit with the right file type.
@@ -229,6 +229,6 @@ Posts are approved by the content team before they reach the code, so the reposi
 | `security.test.ts`     | CSP directives and security headers                                          |
 | `calendly.test.ts`     | Embed URL (pre-fill, appearance, cookie banner kept), trusted-origin message handling, frame-src |
 | `analytics.test.ts`    | Container ID, production-only switch, CSP with analytics on and off, consent store (GPC, broken storage), cookie cleanup, Privacy Policy wording |
-| `assets.test.ts`       | Image URLs; with `pnpm test:assets`, that every image exists in ImageKit and blog images keep their AI-generated marker |
+| `assets.test.ts`       | Image URLs; with `pnpm test:assets`, that every image exists in ImageKit and blog images keep their embedded title and AI-generated marker |
 
 Tests never call Calendly or create bookings. Components are rendered with `react-dom/server`, so tests check the same HTML search engines receive.

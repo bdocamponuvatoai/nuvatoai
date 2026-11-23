@@ -106,7 +106,7 @@ The content team sends a web handoff with an approved MDX file, a JSON-LD file, 
 1. Save the files as `content/blog/<slug>.mdx` and `content/blog/<slug>.schema.json`. The MDX file name must match its `slug`.
 2. Upload the image in the ImageKit dashboard to `nuvato/blog/`, with the file name from the frontmatter's `image` (for example `what-is-an-sop.jpg`) and "Use unique file name" turned **off**. Don't run it through another image tool first: that can strip the embedded metadata the handoff asks you to keep.
 3. Register the post in `blogPosts` in `lib/blog.ts` (one import for each file and one `readPost(...)` line).
-4. Run `pnpm check`, `pnpm test:assets` (confirms the image exists and still carries its AI-generated marker), and `pnpm build`.
+4. Run `pnpm check`, `pnpm test:assets` (confirms the image exists and still carries its embedded title and, for AI images, the AI-generated marker), and `pnpm build`.
 5. On the Vercel preview, view the source: one `<h1>`, the title and description, the image alt, and the JSON-LD. Run the page through Google's [Rich Results Test](https://search.google.com/test/rich-results).
 6. After merging, send the live address back to the content team so they can record the post as published.
 
