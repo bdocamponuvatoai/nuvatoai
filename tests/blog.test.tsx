@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import sitemap from '@/app/sitemap';
 import BlogArticle from '@/components/blog/BlogArticle';
 import BlogIndex from '@/components/blog/BlogIndex';
-import { headingsOf, slugify, type Heading } from '@/components/blog/mdx';
+import { headingsOf, sitePath, slugify, type Heading } from '@/components/blog/mdx';
 import { blogImage } from '@/lib/assets';
 import {
   blogIndex,
@@ -14,7 +14,7 @@ import {
   formatPostDate,
   getBlogPost,
 } from '@/lib/blog';
-import { siteOrigin } from '@/lib/seo';
+import { siteOrigin, sitePaths } from '@/lib/seo';
 
 type Node = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -94,8 +94,19 @@ describe.each(blogPosts)('blog post $slug', (post) => {
   it('keeps the approved word count', async () => {
     const source = await readFile(`content/blog/${post.slug}.mdx`, 'utf8');
     const body = source.replace(/^---\n[\s\S]*?\n---\n/, '');
-    // Counted like the content team's tool: runs of letters and digits.
-    expect(body.match(/[\p{L}\p{N}]+/gu)).toHaveLength(post.wordCount);
+    // Counted like the content team's tool: runs of letters and digits in the words a
+    // reader sees, so a link's address doesn't count.
+    const text = body.replace(/\]\([^)]*\)/g, ']');
+    expect(text.match(/[\p{L}\p{N}]+/gu)).toHaveLength(post.wordCount);
+  });
+
+  it('links only to pages that exist on this site', async () => {
+    const source = await readFile(`content/blog/${post.slug}.mdx`, 'utf8');
+    const pages: string[] = [...sitePaths, ...blogPosts.map(({ path }) => path)];
+    for (const [, href] of source.matchAll(/\]\(([^)\s]+)\)/g)) {
+      const path = sitePath(href);
+      if (path) expect(pages, href).toContain(path.replace(/[?#].*$/, ''));
+    }
   });
 
   it('shows the header image as the exact uploaded file, with its caption and AI note', () => {
@@ -292,7 +303,117 @@ describe('What a small business website costs (web handoff, 18 November 2026)', 
   });
 });
 
+describe('When is a task worth automating (web handoff, 24 November 2026)', () => {
+  const post = getBlogPost('when-is-a-task-worth-automating')!;
+  const html = renderToStaticMarkup(<BlogArticle post={post} />).replace(/>\s+</g, '><');
+
+  it('uses the approved page values', () => {
+    expect(post.path).toBe('/blog/when-is-a-task-worth-automating/');
+    expect(post.title).toBe('When is a task worth automating in a small business?');
+    expect(post.seoTitle).toBe(post.title);
+    expect(post.description).toBe(
+      'A task is worth automating when it repeats, follows the same steps each time and hurts when missed. How to tell, and when to write it down first.',
+    );
+    expect([post.date, post.dateModified]).toEqual(['2026-11-24', '2026-11-24']);
+    expect([post.category, post.readingTime, post.wordCount]).toEqual(['Automation', 6, 1184]);
+  });
+
+  it('keeps the approved image alt text, with no AI note', () => {
+    expect(post.image.path).toBe('/blog/when-is-a-task-worth-automating.jpg');
+    expect([post.image.width, post.image.height, post.image.type]).toEqual([
+      1600,
+      900,
+      'image/jpeg',
+    ]);
+    expect(post.image.alt).toBe(
+      'Licensed stock photo of a laptop on a desk by tall windows, headline: When is a task worth automating in a small business?',
+    );
+    expect(post.image.aiDisclosure).toBeUndefined();
+    expect(html).not.toContain('AI image');
+  });
+
+  it('finds every section', () => {
+    expect(headingsOf(post.Content).map(({ id }) => id)).toEqual([
+      'what-makes-a-task-a-good-fit-for-automation',
+      'what-makes-a-task-a-bad-fit',
+      'should-you-write-the-process-down-before-you-automate-it',
+      'how-do-you-weigh-the-time-a-task-takes-against-the-cost-of-automating-it',
+      'when-will-nuvato-ai-tell-you-a-task-is-not-worth-automating',
+      'what-should-you-automate-first',
+      'common-questions',
+      'what-to-do-next',
+    ]);
+  });
+
+  it('numbers the four questions', () => {
+    const section = html.slice(html.indexOf('<h2 id="what-makes-a-task-a-good-fit'));
+    const [list] = contentsOf(section, 'ol');
+    expect(contentsOf(list, 'li').map((item) => plain(item).split('?')[0])).toEqual([
+      'Does it repeat',
+      'Are the steps the same each time',
+      'Does it start from something you can see',
+      'Does it hurt when it is missed',
+    ]);
+  });
+
+  it('shows the comparison as a table in a card, with column headers', () => {
+    const [table] = contentsOf(html, 'table');
+    expect(html).toContain('<div class="blog-table"><table>');
+    expect(contentsOf(table, 'th').map(plain)).toEqual([
+      'Ask about the task',
+      'Ask about the automation',
+    ]);
+    expect(table.match(/<th scope="col"/g)).toHaveLength(2);
+    expect(contentsOf(table, 'tr')).toHaveLength(5);
+    expect(contentsOf(table, 'td').map(plain)).toEqual([
+      'How often does it happen?',
+      'What does it cost to build?',
+      'How long does it take each time?',
+      'Who looks after it when something changes?',
+      'What happens when it is late or wrong?',
+      'What does a person still need to check?',
+      'Who has to stop other work to do it?',
+      'How will you know if it stops working?',
+    ]);
+  });
+
+  it('links to the SOP guide on this site', () => {
+    // Outside the Next.js runtime, next/link drops the trailing slash `trailingSlash` adds.
+    expect(html).toContain(
+      '<a href="/blog/what-is-an-sop">what an SOP is and when a small business needs one</a>',
+    );
+  });
+
+  it('shows the FAQ as written in "Common questions": the question a heading, its answer below', () => {
+    const block = html.slice(
+      html.indexOf('<h2 id="common-questions">'),
+      html.indexOf('<h2 id="what-to-do-next">'),
+    );
+    expect(block).toMatch(/^<h2 id="common-questions">/);
+    for (const { question, answer } of post.faq) {
+      expect(block).toContain(`<h3>${escape(question)}</h3><p>${escape(answer)}</p>`);
+    }
+  });
+});
+
 describe('blog', () => {
+  it('turns links to this site into paths with the trailing slash', () => {
+    expect(sitePath('https://nuvato.ai/blog/what-is-an-sop')).toBe('/blog/what-is-an-sop/');
+    expect(sitePath('https://www.nuvato.ai/terms')).toBe('/terms/');
+    expect(sitePath('https://nuvato.ai')).toBe('/');
+    expect(sitePath('/blog/what-is-an-sop#what-is-an-sop-not')).toBe(
+      '/blog/what-is-an-sop/#what-is-an-sop-not',
+    );
+    expect(sitePath('https://nuvato.ai/blog/what-is-an-sop.jpg')).toBe('/blog/what-is-an-sop.jpg');
+  });
+
+  it('leaves other links alone', () => {
+    expect(sitePath('#what-is-an-sop')).toBeNull();
+    expect(sitePath('https://example.com/blog/')).toBeNull();
+    expect(sitePath('https://nuvato.ai.example.com/')).toBeNull();
+    expect(sitePath('mailto:legal@nuvato.ai')).toBeNull();
+  });
+
   it('lists posts newest first, each with a unique slug', () => {
     const dates = blogPosts.map((post) => post.date);
     expect(dates).toEqual([...dates].sort().reverse());

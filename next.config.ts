@@ -5,12 +5,17 @@ import { robotsHeaders, siteEnv } from './lib/env';
 
 /**
  * Blog posts are MDX files in content/blog/ (see lib/blog.ts). Their YAML frontmatter is
- * exported as `frontmatter`. Plugins are named as strings because Turbopack can't receive
- * functions; tests compile MDX with the same plugins in vitest.config.ts.
+ * exported as `frontmatter`, and remark-gfm adds GitHub Markdown (tables). Plugins are named
+ * as strings because Turbopack can't receive functions; tests compile MDX with the same
+ * plugins in vitest.config.ts.
  */
 const withMDX = createMDX({
   options: {
-    remarkPlugins: ['remark-frontmatter', ['remark-mdx-frontmatter', { name: 'frontmatter' }]],
+    remarkPlugins: [
+      'remark-frontmatter',
+      ['remark-mdx-frontmatter', { name: 'frontmatter' }],
+      'remark-gfm',
+    ],
   },
 });
 
