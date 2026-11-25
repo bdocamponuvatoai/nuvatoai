@@ -10,6 +10,10 @@ import TaskAutomation, {
   frontmatter as taskAutomation,
 } from '@/content/blog/when-is-a-task-worth-automating.mdx';
 import taskAutomationSchema from '@/content/blog/when-is-a-task-worth-automating.schema.json';
+import AiAgent, {
+  frontmatter as aiAgent,
+} from '@/content/blog/what-can-an-ai-agent-do-for-a-small-business.mdx';
+import aiAgentSchema from '@/content/blog/what-can-an-ai-agent-do-for-a-small-business.schema.json';
 import { assetUrl, blogImage } from './assets';
 import { siteOrigin } from './seo';
 
@@ -133,6 +137,7 @@ export const blogPosts: BlogPost[] = [
     TaskAutomation,
     taskAutomationSchema,
   ),
+  readPost('what-can-an-ai-agent-do-for-a-small-business.mdx', aiAgent, AiAgent, aiAgentSchema),
 ].sort((a, b) => b.date.localeCompare(a.date));
 
 export const getBlogPost = (slug: string) => blogPosts.find((post) => post.slug === slug);

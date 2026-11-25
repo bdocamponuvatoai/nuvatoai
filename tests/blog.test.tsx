@@ -396,6 +396,89 @@ describe('When is a task worth automating (web handoff, 24 November 2026)', () =
   });
 });
 
+describe('What can an AI agent do (web handoff, 25 November 2026)', () => {
+  const post = getBlogPost('what-can-an-ai-agent-do-for-a-small-business')!;
+  const html = renderToStaticMarkup(<BlogArticle post={post} />).replace(/>\s+</g, '><');
+
+  it('uses the approved page values', () => {
+    expect(post.path).toBe('/blog/what-can-an-ai-agent-do-for-a-small-business/');
+    expect(post.title).toBe('What can an AI agent actually do for a small business?');
+    expect(post.seoTitle).toBe(post.title);
+    expect(post.description).toBe(
+      'An AI agent can sort enquiries, draft replies and move details between systems, handing the unusual to a person. What it suits, and what it never does.',
+    );
+    expect([post.date, post.dateModified]).toEqual(['2026-11-25', '2026-11-25']);
+    expect([post.category, post.readingTime, post.wordCount]).toEqual(['AI agents', 6, 1247]);
+  });
+
+  it('keeps the approved image alt text, and shows the AI note with the image', () => {
+    expect(post.image.path).toBe('/blog/what-can-an-ai-agent-do-for-a-small-business.jpg');
+    expect([post.image.width, post.image.height, post.image.type]).toEqual([
+      1600,
+      900,
+      'image/jpeg',
+    ]);
+    expect(post.image.alt).toBe(
+      'AI-generated image of an office desk with two dark screens, headline: What can an AI agent actually do for a small business?',
+    );
+    const disclosure =
+      'Background image generated with Higgsfield (GPT Image 2.6) on 16 Nov 2026; not a real site, person or client.';
+    expect(post.image.aiDisclosure).toBe(disclosure);
+    expect(post.image.digitalSourceType).toBe(
+      'http://cv.iptc.org/newscodes/digitalsourcetype/compositeWithTrainedAlgorithmicMedia',
+    );
+    const [caption] = contentsOf(html, 'figcaption').map(plain);
+    expect(caption).toContain(post.image.caption);
+    expect(caption).toContain(`AI image${disclosure}`);
+  });
+
+  it('finds every section', () => {
+    expect(headingsOf(post.Content).map(({ id }) => id)).toEqual([
+      'what-is-an-ai-agent-in-plain-words',
+      'what-kinds-of-jobs-can-an-ai-agent-handle',
+      'how-does-an-ai-agent-work-step-by-step',
+      'what-is-the-difference-between-an-ai-agent-and-a-chatbot',
+      'what-should-an-ai-agent-never-do-alone',
+      'does-an-ai-agent-replace-staff',
+      'what-does-a-business-need-before-it-uses-an-ai-agent',
+      'how-does-nuvato-ai-approach-ai-agents',
+      'common-questions',
+      'what-to-do-next',
+    ]);
+  });
+
+  it('numbers the six steps of the worked example', () => {
+    const section = html.slice(html.indexOf('<h2 id="how-does-an-ai-agent-work-step-by-step">'));
+    const [list] = contentsOf(section, 'ol');
+    expect(contentsOf(list, 'li').map((item) => plain(item).split('.')[0])).toEqual([
+      'A message arrives',
+      'The agent reads it',
+      'It decides what kind of message it is',
+      'It takes the agreed step',
+      'It hands off what does not fit',
+      'A person checks the work',
+    ]);
+  });
+
+  it('links to the SOP guide on this site', () => {
+    // Outside the Next.js runtime, next/link drops the trailing slash `trailingSlash` adds.
+    expect(html).toContain(
+      '<a href="/blog/what-is-an-sop">what an SOP is and when a small business needs one</a>',
+    );
+  });
+
+  it('shows the FAQ as written in "Common questions": the question a heading, its answer below', () => {
+    const block = html.slice(
+      html.indexOf('<h2 id="common-questions">'),
+      html.indexOf('<h2 id="what-to-do-next">'),
+    );
+    expect(block).toMatch(/^<h2 id="common-questions">/);
+    for (const { question, answer } of post.faq) {
+      expect(block).toContain(`<h3>${escape(question)}</h3><p>${escape(answer)}</p>`);
+    }
+  });
+});
+
 describe('blog', () => {
   it('turns links to this site into paths with the trailing slash', () => {
     expect(sitePath('https://nuvato.ai/blog/what-is-an-sop')).toBe('/blog/what-is-an-sop/');
