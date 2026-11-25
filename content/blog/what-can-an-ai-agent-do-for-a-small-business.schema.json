@@ -1,0 +1,71 @@
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "BlogPosting",
+   "headline": "What can an AI agent actually do for a small business?",
+   "description": "An AI agent can sort enquiries, draft replies and move details between systems, handing the unusual to a person. What it suits, and what it never does.",
+   "datePublished": "2026-11-25",
+   "dateModified": "2026-11-25",
+   "author": {
+    "@type": "Organization",
+    "name": "Nuvato AI",
+    "url": "https://nuvato.ai"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Nuvato AI",
+    "url": "https://nuvato.ai"
+   },
+   "inLanguage": "en-US",
+   "wordCount": 1247,
+   "abstract": "An AI agent can take a routine job with clear steps, such as sorting new enquiries, drafting a first reply or moving information from a form into the right record, and work through it on its own, handing anything unusual to a person. It works best on jobs your team already does the same way every time.",
+   "keywords": "what can an AI agent do for a small business, AI agent vs chatbot, what tasks should an AI agent not do, does an AI agent replace staff, how does an AI agent work step by step",
+   "articleSection": "AI agents",
+   "mainEntityOfPage": "https://nuvato.ai/blog/what-can-an-ai-agent-do-for-a-small-business",
+   "url": "https://nuvato.ai/blog/what-can-an-ai-agent-do-for-a-small-business",
+   "image": {
+    "@type": "ImageObject",
+    "name": "What can an AI agent actually do for a small business?",
+    "caption": "The jobs that suit an agent, and the ones a person keeps, for owners of ten to twenty person businesses.",
+    "description": "AI-generated image of an office desk with two dark screens, headline: What can an AI agent actually do for a small business?",
+    "width": 1600,
+    "height": 900,
+    "encodingFormat": "image/jpeg",
+    "creditText": "Nuvato AI",
+    "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/compositeWithTrainedAlgorithmicMedia",
+    "contentUrl": "https://nuvato.ai/blog/what-can-an-ai-agent-do-for-a-small-business.jpg"
+   }
+  },
+  {
+   "@type": "FAQPage",
+   "url": "https://nuvato.ai/blog/what-can-an-ai-agent-do-for-a-small-business",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What is the difference between an AI agent and a chatbot?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A chatbot answers questions in a conversation and stops when the chat ends. An AI agent works on a job: it reads what arrives, takes steps in the systems it is connected to and hands anything unusual to a person."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What tasks should an AI agent never do alone?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "An agent should not send money, make promises to customers, delete or cancel anything that is hard to undo, or handle complaints and sensitive matters on its own. It can draft and prepare that work, and a person decides."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does an AI agent replace staff?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It changes what staff spend their time on rather than replacing the judgment they bring. The agent takes on routine sorting, retyping and chasing, and people keep the calls, decisions and problems that need a person."
+     }
+    }
+   ]
+  }
+ ]
+}
